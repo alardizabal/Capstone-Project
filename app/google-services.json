@@ -1,0 +1,78 @@
+{
+  "project_info": {
+    "project_number": "173972578226",
+    "firebase_url": "https://pack-overflow.firebaseio.com",
+    "project_id": "pack-overflow",
+    "storage_bucket": "pack-overflow.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173972578226:android:eb4bfb9210e3bdac",
+        "android_client_info": {
+          "package_name": "com.packoverflow.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "173972578226-pt3eadmlj2ga8ads5a5fu46nuglkkb3m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSDZ4K8qlBd6tyl3XN0jXT48cdw0pkDFw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173972578226:android:1608597dcb6d6d00",
+        "android_client_info": {
+          "package_name": "com.albertlardizabal.packoverflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "173972578226-pt3eadmlj2ga8ads5a5fu46nuglkkb3m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSDZ4K8qlBd6tyl3XN0jXT48cdw0pkDFw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "173972578226-pt3eadmlj2ga8ads5a5fu46nuglkkb3m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
