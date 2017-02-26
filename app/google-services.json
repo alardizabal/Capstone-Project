@@ -8,43 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:173972578226:android:eb4bfb9210e3bdac",
-        "android_client_info": {
-          "package_name": "com.packoverflow.android"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "173972578226-pt3eadmlj2ga8ads5a5fu46nuglkkb3m.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDSDZ4K8qlBd6tyl3XN0jXT48cdw0pkDFw"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:173972578226:android:1608597dcb6d6d00",
         "android_client_info": {
           "package_name": "com.albertlardizabal.packoverflow"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "173972578226-0cvd05djflfjlpcdlsmapnia5ccj3b44.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.albertlardizabal.packoverflow",
+            "certificate_hash": "d029bdc1f3caee34696f8638d64ef2c066d205c0"
+          }
+        },
         {
           "client_id": "173972578226-pt3eadmlj2ga8ads5a5fu46nuglkkb3m.apps.googleusercontent.com",
           "client_type": 3
