@@ -13,4 +13,10 @@
     tools:context="com.albertlardizabal.packoverflow.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <fragment
+        android:name="com.albertlardizabal.packoverflow.PackingListFragment"
+        android:id="@+id/packing_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

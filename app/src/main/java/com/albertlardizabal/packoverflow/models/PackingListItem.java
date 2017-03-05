@@ -36,7 +36,7 @@ public class PackingListItem implements Parcelable {
      * @param title
      * The title
      */
-    public void setDate(String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
