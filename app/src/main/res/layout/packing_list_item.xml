@@ -1,28 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="0dp">
+    android:layout_height="88dp" >
 
     <CheckBox android:id="@+id/list_item_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onCheckboxClicked"/>
 
-    <TextView android:id="@+id/list_item_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Title"/>
-
-    <TextView android:id="@+id/list_item_subtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Subtitle"/>
-
     <TextView android:id="@+id/list_item_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:text="x2"/>
 
-</LinearLayout>
+    <TextView android:id="@+id/list_item_title"
+        android:paddingLeft="@dimen/standard_margin"
+        android:paddingStart="@dimen/standard_margin"
+        android:paddingRight="@dimen/standard_margin"
+        android:paddingEnd="@dimen/standard_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/list_item_checkbox"
+        android:layout_toEndOf="@+id/list_item_checkbox"
+        android:layout_toLeftOf="@+id/list_item_count"
+        android:layout_toStartOf="@+id/list_item_count"
+        android:text="Title"/>
+
+    <TextView android:id="@+id/list_item_subtitle"
+        android:paddingLeft="@dimen/standard_margin"
+        android:paddingStart="@dimen/standard_margin"
+        android:paddingRight="@dimen/standard_margin"
+        android:paddingEnd="@dimen/standard_margin"
+        android:paddingTop="@dimen/standard_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list_item_title"
+        android:layout_toRightOf="@+id/list_item_checkbox"
+        android:layout_toEndOf="@+id/list_item_checkbox"
+        android:layout_toLeftOf="@+id/list_item_count"
+        android:layout_toStartOf="@+id/list_item_count"
+        android:text="Subtitle"/>
+
+</RelativeLayout>
