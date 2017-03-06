@@ -11,7 +11,13 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +31,10 @@ public class PackingListFragment extends Fragment {
     private RecyclerView recyclerView;
     private PackingListAdapter adapter;
 
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference rootReference = firebaseDatabase.getReference();
+    private DatabaseReference savedListsReference = rootReference.child("saved_lists");
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,7 +46,57 @@ public class PackingListFragment extends Fragment {
 
         updateUI();
 
+        PackingListItem packingListItem = new PackingListItem();
+        packingListItem.setTitle("Pants");
+        packingListItem.setSubtitle("Apples");
+        packingListItem.setCount(4);
+        savedListsReference.push().setValue(packingListItem);
+
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //        savedListsReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                PackingListItem packingListItem2 = dataSnapshot.getValue(PackingListItem.class);
+//                System.out.print("Hello");
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+        savedListsReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                List<PackingList> packingListItems = (List) dataSnapshot.getChildren();
+                System.out.print("Hello");
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void updateUI() {

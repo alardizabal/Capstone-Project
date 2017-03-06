@@ -6,11 +6,13 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
- * Created by albertlardizabal on 2/25/17.
+ * Created by albertlardizabal on 3/5/17.
  */
 
-public class PackingListItem implements Parcelable {
+public class PackingList implements Parcelable {
 
     @SerializedName("uid")
     @Expose
@@ -18,15 +20,9 @@ public class PackingListItem implements Parcelable {
     @SerializedName("title")
     @Expose
     private String title;
-    @SerializedName("subtitle")
+    @SerializedName("items")
     @Expose
-    private String subtitle;
-    @SerializedName("bagType")
-    @Expose
-    private String bagType;
-    @SerializedName("count")
-    @Expose
-    private int count;
+    private List<PackingList> items;
 
     /**
      *
@@ -67,47 +63,19 @@ public class PackingListItem implements Parcelable {
     /**
      *
      * @return
-     * The subtitle
+     * The items
      */
-    public String getSubtitle() { return subtitle; }
-
-    /**
-     *
-     * @param subtitle
-     * The subtitle
-     */
-    public void setSubtitle(String subtitle) { this.subtitle = subtitle; }
-
-    /**
-     *
-     * @return
-     * The bagType
-     */
-    public String getBagType() { return bagType; }
-
-    /**
-     *
-     * @param bagType
-     * The bagType
-     */
-    public void setBagType(String bagType) { this.bagType = bagType; }
-
-    /**
-     *
-     * @return
-     * The count
-     */
-    public int getCount() {
-        return count;
+    public List getItems() {
+        return items;
     }
 
     /**
      *
-     * @param count
-     * The count
+     * @param items
+     * The items
      */
-    public void setCount(int count) {
-        this.count = count;
+    public void setItems(List<PackingList> items) {
+        this.items = items;
     }
 
     @Override
@@ -119,9 +87,7 @@ public class PackingListItem implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(uid);
         dest.writeString(title);
-        dest.writeString(subtitle);
-        dest.writeString(bagType);
-        dest.writeInt(count);
+        dest.writeList(items);
     }
 
     public static final Parcelable.Creator<PackingListItem> CREATOR = new Parcelable.Creator<PackingListItem>() {
