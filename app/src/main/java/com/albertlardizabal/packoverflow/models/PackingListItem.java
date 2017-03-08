@@ -15,13 +15,16 @@ public class PackingListItem implements Parcelable {
     @SerializedName("uid")
     @Expose
     private String uid;
+    @SerializedName("is_checked")
+    @Expose
+    private boolean isChecked;
     @SerializedName("title")
     @Expose
     private String title;
     @SerializedName("subtitle")
     @Expose
     private String subtitle;
-    @SerializedName("bagType")
+    @SerializedName("bag_type")
     @Expose
     private String bagType;
     @SerializedName("count")
@@ -44,6 +47,24 @@ public class PackingListItem implements Parcelable {
      */
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    /**
+     *
+     * @return
+     * The is item checked flag
+     */
+    public boolean getIsChecked() {
+        return isChecked;
+    }
+
+    /**
+     *
+     * @param isChecked
+     * The is item checked flag
+     */
+    public void setIsChecked(boolean isChecked) {
+        this.isChecked = isChecked;
     }
 
     /**

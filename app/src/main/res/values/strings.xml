@@ -4,5 +4,14 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="action_calendar">Calendar</string>
+    <string name="action_share">Share</string>
     <string name="action_settings">Settings</string>
+
+    <string name="dialog_item_title_hint">Title</string>
+    <string name="dialog_item_subtitle_hint">Description</string>
+    <string name="dialog_item_count_hint">Count</string>
+    <string name="dialog_ok">Ok</string>
+    <string name="dialog_cancel">Cancel</string>
+
 </resources>

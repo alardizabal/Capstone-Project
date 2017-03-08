@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public class PackingList implements Parcelable {
     private String title;
     @SerializedName("items")
     @Expose
-    private List<PackingList> items;
+    private ArrayList<PackingListItem> items;
 
     /**
      *
@@ -74,8 +75,12 @@ public class PackingList implements Parcelable {
      * @param items
      * The items
      */
-    public void setItems(List<PackingList> items) {
+    public void setItems(ArrayList<PackingListItem> items) {
         this.items = items;
+    }
+
+    public void addItem(PackingListItem item) {
+        this.items.add(item);
     }
 
     @Override
