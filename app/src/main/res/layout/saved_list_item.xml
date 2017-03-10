@@ -4,18 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="88dp" >
 
-    <TextView android:id="@+id/saved_list_item_title"
+    <CheckBox android:id="@+id/list_item_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/standard_margin"
+        android:layout_centerVertical="true"/>
+
+    <TextView android:id="@+id/saved_list_item_title"
         android:paddingLeft="@dimen/standard_margin"
-        android:paddingEnd="@dimen/standard_margin"
+        android:paddingStart="@dimen/standard_margin"
         android:paddingRight="@dimen/standard_margin"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
+        android:paddingEnd="@dimen/standard_margin"
+        android:layout_toRightOf="@id/list_item_checkbox"
+        android:layout_toEndOf="@id/list_item_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:text="x2"/>
+        android:text="Title"/>
 
 </RelativeLayout>

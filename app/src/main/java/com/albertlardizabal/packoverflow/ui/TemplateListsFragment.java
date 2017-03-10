@@ -6,9 +6,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
@@ -24,6 +27,8 @@ import java.util.List;
 
 public class TemplateListsFragment extends Fragment {
 
+    private static final String LOG_TAG = SavedListsFragment.class.getSimpleName();
+
     private ListTemplateDbHelper dbHelper = new ListTemplateDbHelper(getContext());
 
     private RecyclerView recyclerView;
@@ -33,10 +38,10 @@ public class TemplateListsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_packing_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_template_lists, container, false);
         view.setBackgroundColor(Color.CYAN);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.packing_list_recycler_view);
+        recyclerView = (RecyclerView) view.findViewById(R.id.template_lists_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         updateUI();
@@ -75,14 +80,24 @@ public class TemplateListsFragment extends Fragment {
     public class TemplateListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private PackingList listItem;
+
+        private CheckBox checkBox;
         private TextView title;
 
         public TemplateListsHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.saved_list_item, parent, false));
 
+            checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
             title = (TextView) itemView.findViewById(R.id.saved_list_item_title);
 
             itemView.setOnClickListener(this);
+
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Log.d(LOG_TAG, "tapped");
+                }
+            });
         }
 
         public void bind(PackingList packingList) {

@@ -1,5 +1,6 @@
 package com.albertlardizabal.packoverflow.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -17,8 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.albertlardizabal.packoverflow.R;
-import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
+import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class MainActivity extends AppCompatActivity
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton fab;
     private MenuItem calendarMenuItem;
     private MenuItem shareMenuItem;
+    private MenuItem deleteSelectedMenuItem;
     private MenuItem deleteListMenuItem;
 
     private static final int RC_SIGN_IN = 123;
@@ -93,9 +95,18 @@ public class MainActivity extends AppCompatActivity
 
         calendarMenuItem = menu.findItem(R.id.action_calendar);
         shareMenuItem = menu.findItem(R.id.action_share);
+        deleteSelectedMenuItem = menu.findItem(R.id.action_delete_selected);
         deleteListMenuItem = menu.findItem(R.id.action_delete_list);
 
         return true;
+    }
+
+    // Call to update the share intent
+    private void setShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+        shareIntent.setType("text/plain");
+        startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_list_title)));
     }
 
     @Override
@@ -106,7 +117,15 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete_list) {
+        if (id == R.id.action_calendar) {
+            return true;
+        } else if (id == R.id.action_share) {
+            // TODO
+            setShareIntent();
+            return true;
+        } else if (id == R.id.action_delete_selected) {
+            return true;
+        } else if (id == R.id.action_delete_list) {
             return true;
         }
 
@@ -127,18 +146,21 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_current_list) {
             fragment = new PackingListFragment();
             fab.setVisibility(View.VISIBLE);
-            showMenuItems();
             CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
+            showMenuItems();
+            deleteListMenuItem.setVisible(true);
         } else if (id == R.id.nav_saved_lists) {
             fragment = new SavedListsFragment();
             fab.setVisibility(View.VISIBLE);
-            hideMenuItems();
             CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
+            hideMenuItems();
+            deleteListMenuItem.setVisible(false);
         } else if (id == R.id.nav_template_lists) {
             fragment = new TemplateListsFragment();
             fab.setVisibility(View.GONE);
-            hideMenuItems();
             CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
+            hideMenuItems();
+            deleteListMenuItem.setVisible(false);
         }
 
         transaction.replace(R.id.content_main, fragment);
@@ -153,12 +175,10 @@ public class MainActivity extends AppCompatActivity
     private void showMenuItems() {
         calendarMenuItem.setVisible(true);
         shareMenuItem.setVisible(true);
-        deleteListMenuItem.setVisible(true);
     }
 
     private void hideMenuItems() {
         calendarMenuItem.setVisible(false);
         shareMenuItem.setVisible(false);
-        deleteListMenuItem.setVisible(false);
     }
 }
