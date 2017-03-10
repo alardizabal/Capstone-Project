@@ -10,11 +10,11 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.albertlardizabal.packoverflow.MainActivity"
+    tools:context="com.albertlardizabal.packoverflow.ui.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <fragment
-        android:name="com.albertlardizabal.packoverflow.PackingListFragment"
+        android:name="com.albertlardizabal.packoverflow.ui.PackingListFragment"
         android:id="@+id/packing_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -27,9 +27,9 @@ public class PackingListItem implements Parcelable {
     @SerializedName("bag_type")
     @Expose
     private String bagType;
-    @SerializedName("count")
+    @SerializedName("quantity")
     @Expose
-    private int count;
+    private int quantity;
 
     /**
      *
@@ -116,19 +116,19 @@ public class PackingListItem implements Parcelable {
     /**
      *
      * @return
-     * The count
+     * The quantity
      */
-    public int getCount() {
-        return count;
+    public int getQuantity() {
+        return quantity;
     }
 
     /**
      *
-     * @param count
-     * The count
+     * @param quantity
+     * The quantity
      */
-    public void setCount(int count) {
-        this.count = count;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     @Override
@@ -142,7 +142,7 @@ public class PackingListItem implements Parcelable {
         dest.writeString(title);
         dest.writeString(subtitle);
         dest.writeString(bagType);
-        dest.writeInt(count);
+        dest.writeInt(quantity);
     }
 
     public static final Parcelable.Creator<PackingListItem> CREATOR = new Parcelable.Creator<PackingListItem>() {

@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:onClick="onCheckboxClicked"/>
 
-    <TextView android:id="@+id/list_item_count"
+    <TextView android:id="@+id/list_item_quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -27,8 +27,8 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/list_item_checkbox"
         android:layout_toEndOf="@+id/list_item_checkbox"
-        android:layout_toLeftOf="@+id/list_item_count"
-        android:layout_toStartOf="@+id/list_item_count"
+        android:layout_toLeftOf="@+id/list_item_quantity"
+        android:layout_toStartOf="@+id/list_item_quantity"
         android:text="Title"/>
 
     <TextView android:id="@+id/list_item_subtitle"
@@ -42,8 +42,8 @@
         android:layout_below="@+id/list_item_title"
         android:layout_toRightOf="@+id/list_item_checkbox"
         android:layout_toEndOf="@+id/list_item_checkbox"
-        android:layout_toLeftOf="@+id/list_item_count"
-        android:layout_toStartOf="@+id/list_item_count"
+        android:layout_toLeftOf="@+id/list_item_quantity"
+        android:layout_toStartOf="@+id/list_item_quantity"
         android:text="Subtitle"/>
 
 </RelativeLayout>

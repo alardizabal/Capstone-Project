@@ -1,4 +1,4 @@
-package com.albertlardizabal.packoverflow;
+package com.albertlardizabal.packoverflow.ui;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -7,7 +7,10 @@ import android.support.annotation.ColorRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,6 +20,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.albertlardizabal.packoverflow.R;
+import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class MainActivity extends AppCompatActivity
@@ -25,6 +30,10 @@ public class MainActivity extends AppCompatActivity
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private FirebaseAnalytics firebaseAnalytics;
+    private FloatingActionButton fab;
+    private MenuItem calendarMenuItem;
+    private MenuItem shareMenuItem;
+    private MenuItem deleteListMenuItem;
 
     private static final int RC_SIGN_IN = 123;
 
@@ -36,15 +45,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DialogFragment newFragment = new EditItemDialogFragment();
                 newFragment.show(getSupportFragmentManager(), "editListItem");
-
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
 
@@ -77,11 +83,9 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        MenuItem menuItem = menu.findItem(R.id.action_calendar);
-
-        if (menuItem != null) {
-            tintMenuIcon(MainActivity.this, menuItem, R.color.colorWhite);
-        }
+        calendarMenuItem = menu.findItem(R.id.action_calendar);
+        shareMenuItem = menu.findItem(R.id.action_share);
+        deleteListMenuItem = menu.findItem(R.id.action_delete_list);
 
         return true;
     }
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_delete_list) {
             return true;
         }
 
@@ -104,22 +108,32 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        Fragment fragment = new Fragment();
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        if (id == R.id.nav_current_list) {
+            fragment = new PackingListFragment();
+            fab.setVisibility(View.VISIBLE);
+            calendarMenuItem.setVisible(true);
+        } else if (id == R.id.nav_saved_lists) {
+            fragment = new SavedListsFragment();
+            fab.setVisibility(View.GONE);
+            calendarMenuItem.setVisible(false);
+        } else if (id == R.id.nav_template_lists) {
+            fragment = new TemplateListsFragment();
+            fab.setVisibility(View.GONE);
+            calendarMenuItem.setVisible(false);
+        } else if (id == R.id.nav_about) {
 
         }
+        transaction.replace(R.id.content_main, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

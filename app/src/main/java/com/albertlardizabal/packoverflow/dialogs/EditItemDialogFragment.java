@@ -1,4 +1,4 @@
-package com.albertlardizabal.packoverflow;
+package com.albertlardizabal.packoverflow.dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+
+import com.albertlardizabal.packoverflow.R;
 
 /**
  * Created by albertlardizabal on 3/8/17.

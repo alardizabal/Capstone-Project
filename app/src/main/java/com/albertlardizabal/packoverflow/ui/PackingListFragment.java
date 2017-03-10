@@ -1,16 +1,18 @@
-package com.albertlardizabal.packoverflow;
+package com.albertlardizabal.packoverflow.ui;
 
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.albertlardizabal.packoverflow.models.PackingList;
+import com.albertlardizabal.packoverflow.R;
+import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -22,13 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by albertlardizabal on 2/26/17.
+ * Created by albertlardizabal on 2/25/17.
  */
 
-public class SavedListsFragment extends Fragment {
+public class PackingListFragment extends Fragment {
+
+    private static final String LOG_TAG = PackingListFragment.class.getSimpleName();
 
     private RecyclerView recyclerView;
-    private SavedListsAdapter adapter;
+    private PackingListAdapter adapter;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference rootReference = firebaseDatabase.getReference();
@@ -45,39 +49,26 @@ public class SavedListsFragment extends Fragment {
 
         updateUI();
 
-        stageData();
+        savedListsReference.child("Overnight").setValue(Utils.stageData());
 
         return view;
-    }
-
-    private void stageData() {
-        PackingListItem packingListItem = new PackingListItem();
-        packingListItem.setTitle("Shirt");
-        packingListItem.setSubtitle("Apples");
-        packingListItem.setCount(1);
-
-        PackingListItem packingListItem2 = new PackingListItem();
-        packingListItem.setTitle("Pants");
-        packingListItem.setSubtitle("Bananas");
-        packingListItem.setCount(2);
-
-        PackingListItem packingListItem3 = new PackingListItem();
-        packingListItem.setTitle("Shoes");
-        packingListItem.setSubtitle("Coconuts");
-        packingListItem.setCount(3);
-
-        PackingList packingList = new PackingList();
-        packingList.setTitle("Overnight");
-        packingList.addItem(packingListItem);
-        packingList.addItem(packingListItem2);
-        packingList.addItem(packingListItem3);
-
-        savedListsReference.push().setValue(packingListItem);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        //        savedListsReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                PackingListItem packingListItem2 = dataSnapshot.getValue(PackingListItem.class);
+//                System.out.print("Hello");
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
         savedListsReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -108,32 +99,40 @@ public class SavedListsFragment extends Fragment {
     }
 
     private void updateUI() {
-        List<PackingList> listItems = new ArrayList<>();
+        List<PackingListItem> listItems = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            PackingList item = new PackingList();
+            PackingListItem item = new PackingListItem();
             item.setTitle("Title");
+            item.setSubtitle("Subtitle");
+            item.setQuantity(7);
             listItems.add(item);
         }
-        adapter = new SavedListsAdapter(listItems);
+        adapter = new PackingListAdapter(listItems);
         recyclerView.setAdapter(adapter);
     }
 
-    public class SavedListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class PackingListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private PackingList listItem;
+        private PackingListItem listItem;
 
+        private CheckBox checkBox;
         private TextView title;
+        private TextView subtitle;
+        private TextView count;
 
-        public SavedListsHolder(LayoutInflater inflater, ViewGroup parent) {
+        public PackingListHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.packing_list_item, parent, false));
 
+            checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
             title = (TextView) itemView.findViewById(R.id.list_item_title);
+            subtitle = (TextView) itemView.findViewById(R.id.list_item_subtitle);
+            count = (TextView) itemView.findViewById(R.id.list_item_quantity);
 
             itemView.setOnClickListener(this);
         }
 
-        public void bind(PackingList packingList) {
-            listItem = packingList;
+        public void bind(PackingListItem packingListItem) {
+            listItem = packingListItem;
         }
 
         @Override
@@ -142,21 +141,21 @@ public class SavedListsFragment extends Fragment {
         }
     }
 
-    public class SavedListsAdapter extends RecyclerView.Adapter<SavedListsHolder> {
+    public class PackingListAdapter extends RecyclerView.Adapter<PackingListHolder> {
 
-        private List<PackingList> listItems;
+        private List<PackingListItem> listItems;
 
-        public SavedListsAdapter(List<PackingList> listItems) { this.listItems = listItems; }
+        public PackingListAdapter(List<PackingListItem> listItems) { this.listItems = listItems; }
 
         @Override
-        public SavedListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public PackingListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new SavedListsHolder(layoutInflater, parent);
+            return new PackingListHolder(layoutInflater, parent);
         }
 
         @Override
-        public void onBindViewHolder(SavedListsHolder holder, int position) {
-            PackingList listItem = listItems.get(position);
+        public void onBindViewHolder(PackingListHolder holder, int position) {
+            PackingListItem listItem = listItems.get(position);
             holder.bind(listItem);
         }
 

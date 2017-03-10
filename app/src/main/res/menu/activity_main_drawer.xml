@@ -3,33 +3,25 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_current_list"
             android:icon="@drawable/common_google_signin_btn_icon_dark"
-            android:title="Import" />
+            android:title="@string/current_list" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_saved_lists"
             android:icon="@drawable/common_google_signin_btn_icon_dark"
-            android:title="Gallery" />
+            android:title="@string/saved_lists" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_template_lists"
             android:icon="@drawable/common_google_signin_btn_icon_dark"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/common_google_signin_btn_icon_dark"
-            android:title="Tools" />
+            android:title="@string/template_lists" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_about"
                 android:icon="@drawable/common_google_signin_btn_icon_dark"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/common_google_signin_btn_icon_dark"
-                android:title="Send" />
+                android:title="@string/about" />
         </menu>
     </item>
 

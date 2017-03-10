@@ -1,0 +1,40 @@
+package com.albertlardizabal.packoverflow.helpers;
+
+import com.albertlardizabal.packoverflow.models.PackingList;
+import com.albertlardizabal.packoverflow.models.PackingListItem;
+
+import java.util.ArrayList;
+
+/**
+ * Created by albertlardizabal on 3/8/17.
+ */
+
+public final class Utils {
+
+    public static PackingList stageData() {
+        PackingListItem packingListItem = new PackingListItem();
+        packingListItem.setTitle("Shirt");
+        packingListItem.setSubtitle("Apples");
+        packingListItem.setQuantity(1);
+
+        PackingListItem packingListItem2 = new PackingListItem();
+        packingListItem2.setTitle("Pants");
+        packingListItem2.setSubtitle("Bananas");
+        packingListItem2.setQuantity(2);
+
+        PackingListItem packingListItem3 = new PackingListItem();
+        packingListItem3.setTitle("Shoes");
+        packingListItem3.setSubtitle("Coconuts");
+        packingListItem3.setQuantity(3);
+
+        PackingList packingList = new PackingList();
+        packingList.setTitle("Overnight");
+        ArrayList<PackingListItem> plist = new ArrayList<>();
+        plist.add(packingListItem);
+        plist.add(packingListItem2);
+        plist.add(packingListItem3);
+        packingList.setItems(plist);
+
+        return packingList;
+    }
+}
