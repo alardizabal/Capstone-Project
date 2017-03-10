@@ -79,10 +79,6 @@ public class PackingList implements Parcelable {
         this.items = items;
     }
 
-    public void addItem(PackingListItem item) {
-        this.items.add(item);
-    }
-
     @Override
     public int describeContents() {
         return 0;

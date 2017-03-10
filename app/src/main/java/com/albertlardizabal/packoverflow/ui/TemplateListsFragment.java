@@ -1,5 +1,7 @@
 package com.albertlardizabal.packoverflow.ui;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
+import com.albertlardizabal.packoverflow.database.ListTemplateContract;
 import com.albertlardizabal.packoverflow.database.ListTemplateDbHelper;
 import com.albertlardizabal.packoverflow.models.PackingList;
 
@@ -27,9 +30,9 @@ import java.util.List;
 
 public class TemplateListsFragment extends Fragment {
 
-    private static final String LOG_TAG = SavedListsFragment.class.getSimpleName();
+    private static final String LOG_TAG = TemplateListsFragment.class.getSimpleName();
 
-    private ListTemplateDbHelper dbHelper = new ListTemplateDbHelper(getContext());
+    private ListTemplateDbHelper dbHelper;
 
     private RecyclerView recyclerView;
     private TemplateListsAdapter adapter;
@@ -55,15 +58,16 @@ public class TemplateListsFragment extends Fragment {
 
         // TODO - Wrap in AsyncTask
         // Gets the data repository in write mode
-//        SQLiteDatabase db = dbHelper.getWritableDatabase();
-//
-//        // Create a new map of values, where column names are the keys
-//        ContentValues values = new ContentValues();
-//        values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Scuba Diving Expedition");
-//        values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
-//
-//        // Insert the new row, returning the primary key value of the new row
-//        long newRowId = db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
+        dbHelper = new ListTemplateDbHelper(getContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Scuba Diving Expedition");
+        values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
+
+        // Insert the new row, returning the primary key value of the new row
+        long newRowId = db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
     }
 
     private void updateUI() {

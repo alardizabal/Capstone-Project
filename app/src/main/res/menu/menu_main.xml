@@ -12,8 +12,7 @@
         android:id="@+id/action_share"
         android:icon="@drawable/ic_vector_share"
         android:title="@string/action_share"
-        app:showAsAction="ifRoom"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_delete_selected"
         android:orderInCategory="100"

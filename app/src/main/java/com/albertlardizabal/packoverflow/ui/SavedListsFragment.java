@@ -74,11 +74,15 @@ public class SavedListsFragment extends Fragment {
         packingListItem.setSubtitle("Coconuts");
         packingListItem.setQuantity(3);
 
-//        PackingList packingList = new PackingList();
-//        packingList.setTitle("Overnight");
-//        packingList.addItem(packingListItem);
-//        packingList.addItem(packingListItem2);
-//        packingList.addItem(packingListItem3);
+        PackingList packingList = new PackingList();
+        packingList.setTitle("Overnight");
+
+        ArrayList<PackingListItem> itemList = new ArrayList<>();
+        itemList.add(packingListItem);
+        itemList.add(packingListItem2);
+        itemList.add(packingListItem3);
+
+        packingList.setItems(itemList);
 
         savedListsReference.push().setValue(packingListItem);
     }
