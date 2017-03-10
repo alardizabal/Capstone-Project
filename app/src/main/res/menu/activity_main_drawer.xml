@@ -4,25 +4,16 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_current_list"
-            android:icon="@drawable/common_google_signin_btn_icon_dark"
+            android:icon="@drawable/ic_vector_list"
             android:title="@string/current_list" />
         <item
             android:id="@+id/nav_saved_lists"
-            android:icon="@drawable/common_google_signin_btn_icon_dark"
+            android:icon="@drawable/ic_vector_list"
             android:title="@string/saved_lists" />
         <item
             android:id="@+id/nav_template_lists"
-            android:icon="@drawable/common_google_signin_btn_icon_dark"
+            android:icon="@drawable/ic_vector_list"
             android:title="@string/template_lists" />
     </group>
-
-    <item android:title="">
-        <menu>
-            <item
-                android:id="@+id/nav_about"
-                android:icon="@drawable/common_google_signin_btn_icon_dark"
-                android:title="@string/about" />
-        </menu>
-    </item>
 
 </menu>

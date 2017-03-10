@@ -1,14 +1,10 @@
 package com.albertlardizabal.packoverflow.ui;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.albertlardizabal.packoverflow.R;
+import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -37,6 +34,12 @@ public class MainActivity extends AppCompatActivity
 
     private static final int RC_SIGN_IN = 123;
 
+    private static final int PACKING_LIST_FRAGMENT = 1000;
+    private static final int SAVED_LISTS_FRAGMENT = 1001;
+    private static final int TEMPLATE_LISTS_FRAGMENT = 1002;
+
+    private static int CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +52,13 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new EditItemDialogFragment();
-                newFragment.show(getSupportFragmentManager(), "editListItem");
+                if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
+                    DialogFragment newFragment = new EditItemDialogFragment();
+                    newFragment.show(getSupportFragmentManager(), "editListItem");
+                } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
+                    DialogFragment newFragment = new EditListDialogFragment();
+                    newFragment.show(getSupportFragmentManager(), "editList");
+                }
             }
         });
 
@@ -119,18 +127,20 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_current_list) {
             fragment = new PackingListFragment();
             fab.setVisibility(View.VISIBLE);
-            calendarMenuItem.setVisible(true);
+            showMenuItems();
+            CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
         } else if (id == R.id.nav_saved_lists) {
             fragment = new SavedListsFragment();
-            fab.setVisibility(View.GONE);
-            calendarMenuItem.setVisible(false);
+            fab.setVisibility(View.VISIBLE);
+            hideMenuItems();
+            CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
         } else if (id == R.id.nav_template_lists) {
             fragment = new TemplateListsFragment();
             fab.setVisibility(View.GONE);
-            calendarMenuItem.setVisible(false);
-        } else if (id == R.id.nav_about) {
-
+            hideMenuItems();
+            CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
         }
+
         transaction.replace(R.id.content_main, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
@@ -140,11 +150,15 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public static void tintMenuIcon(Context context, MenuItem item, @ColorRes int color) {
-        Drawable normalDrawable = item.getIcon();
-        Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
-        DrawableCompat.setTint(wrapDrawable, context.getResources().getColor(color));
+    private void showMenuItems() {
+        calendarMenuItem.setVisible(true);
+        shareMenuItem.setVisible(true);
+        deleteListMenuItem.setVisible(true);
+    }
 
-        item.setIcon(wrapDrawable);
+    private void hideMenuItems() {
+        calendarMenuItem.setVisible(false);
+        shareMenuItem.setVisible(false);
+        deleteListMenuItem.setVisible(false);
     }
 }

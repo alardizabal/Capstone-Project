@@ -1,14 +1,17 @@
 package com.albertlardizabal.packoverflow.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
@@ -34,6 +37,8 @@ public class PackingListFragment extends Fragment {
     private RecyclerView recyclerView;
     private PackingListAdapter adapter;
 
+    private List<PackingListItem> listItems;
+
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference rootReference = firebaseDatabase.getReference();
     private DatabaseReference savedListsReference = rootReference.child("saved_lists");
@@ -43,6 +48,7 @@ public class PackingListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_packing_list, container, false);
+        view.setBackgroundColor(Color.WHITE);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.packing_list_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -99,7 +105,7 @@ public class PackingListFragment extends Fragment {
     }
 
     private void updateUI() {
-        List<PackingListItem> listItems = new ArrayList<>();
+        listItems = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             PackingListItem item = new PackingListItem();
             item.setTitle("Title");
@@ -118,7 +124,7 @@ public class PackingListFragment extends Fragment {
         private CheckBox checkBox;
         private TextView title;
         private TextView subtitle;
-        private TextView count;
+        private TextView quantity;
 
         public PackingListHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.packing_list_item, parent, false));
@@ -126,9 +132,16 @@ public class PackingListFragment extends Fragment {
             checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
             title = (TextView) itemView.findViewById(R.id.list_item_title);
             subtitle = (TextView) itemView.findViewById(R.id.list_item_subtitle);
-            count = (TextView) itemView.findViewById(R.id.list_item_quantity);
+            quantity = (TextView) itemView.findViewById(R.id.list_item_quantity);
 
             itemView.setOnClickListener(this);
+
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Log.d(LOG_TAG, "tapped");
+                }
+            });
         }
 
         public void bind(PackingListItem packingListItem) {

@@ -14,7 +14,7 @@ import com.albertlardizabal.packoverflow.R;
  * Created by albertlardizabal on 3/8/17.
  */
 
-public class AddListDialogFragment extends DialogFragment {
+public class EditListDialogFragment extends DialogFragment {
 
     @NonNull
     @Override
@@ -23,7 +23,7 @@ public class AddListDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        builder.setView(inflater.inflate(R.layout.fragment_add_list_dialog, null))
+        builder.setView(inflater.inflate(R.layout.fragment_edit_list_dialog, null))
                 .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -32,7 +32,7 @@ public class AddListDialogFragment extends DialogFragment {
                 })
                 .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        AddListDialogFragment.this.getDialog().cancel();
+                        EditListDialogFragment.this.getDialog().cancel();
                     }
                 });
         return builder.create();
