@@ -7,7 +7,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by albertlardizabal on 3/5/17.
@@ -24,6 +23,9 @@ public class PackingList implements Parcelable {
     @SerializedName("items")
     @Expose
     private ArrayList<PackingListItem> items;
+    @SerializedName("is_active")
+    @Expose
+    private boolean isActive;
 
     /**
      *
@@ -66,7 +68,7 @@ public class PackingList implements Parcelable {
      * @return
      * The items
      */
-    public List getItems() {
+    public ArrayList<PackingListItem> getItems() {
         return items;
     }
 
@@ -79,6 +81,24 @@ public class PackingList implements Parcelable {
         this.items = items;
     }
 
+    /**
+     *
+     * @return
+     * The flag for the active list
+     */
+    public boolean isActive() {
+        return isActive;
+    }
+
+    /**
+     *
+     * @param isActive
+     * The flag for the active list
+     */
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -89,6 +109,7 @@ public class PackingList implements Parcelable {
         dest.writeString(uid);
         dest.writeString(title);
         dest.writeList(items);
+        dest.writeByte((byte) (isActive ? 1 : 0));
     }
 
     public static final Parcelable.Creator<PackingListItem> CREATOR = new Parcelable.Creator<PackingListItem>() {

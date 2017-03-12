@@ -20,7 +20,10 @@ import android.view.View;
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
+import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.analytics.FirebaseAnalytics;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton fab;
     private MenuItem calendarMenuItem;
     private MenuItem shareMenuItem;
+    private MenuItem renameListMenuItem;
     private MenuItem deleteSelectedMenuItem;
     private MenuItem deleteListMenuItem;
 
@@ -95,6 +99,7 @@ public class MainActivity extends AppCompatActivity
 
         calendarMenuItem = menu.findItem(R.id.action_calendar);
         shareMenuItem = menu.findItem(R.id.action_share);
+        renameListMenuItem = menu.findItem(R.id.action_rename_list);
         deleteSelectedMenuItem = menu.findItem(R.id.action_delete_selected);
         deleteListMenuItem = menu.findItem(R.id.action_delete_list);
 
@@ -103,8 +108,17 @@ public class MainActivity extends AppCompatActivity
 
     // Call to update the share intent
     private void setShareIntent() {
+        ArrayList<PackingListItem> list = PackingListFragment.currentListItems;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (PackingListItem item : list) {
+            stringBuilder.append(item.getTitle());
+            stringBuilder.append("\n");
+        }
+        String currentListString = stringBuilder.toString();
+
+        shareIntent.putExtra(Intent.EXTRA_TEXT, currentListString);
         shareIntent.setType("text/plain");
         startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_list_title)));
     }
@@ -120,9 +134,10 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_calendar) {
             return true;
         } else if (id == R.id.action_share) {
-            // TODO
             setShareIntent();
             return true;
+        } else if (id == R.id.action_rename_list) {
+
         } else if (id == R.id.action_delete_selected) {
             return true;
         } else if (id == R.id.action_delete_list) {
@@ -148,18 +163,21 @@ public class MainActivity extends AppCompatActivity
             fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
             showMenuItems();
+            renameListMenuItem.setVisible(true);
             deleteListMenuItem.setVisible(true);
         } else if (id == R.id.nav_saved_lists) {
             fragment = new SavedListsFragment();
             fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
             hideMenuItems();
+            renameListMenuItem.setVisible(false);
             deleteListMenuItem.setVisible(false);
         } else if (id == R.id.nav_template_lists) {
             fragment = new TemplateListsFragment();
             fab.setVisibility(View.GONE);
             CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
             hideMenuItems();
+            renameListMenuItem.setVisible(false);
             deleteListMenuItem.setVisible(false);
         }
 

@@ -11,23 +11,27 @@ import java.util.ArrayList;
 
 public final class Utils {
 
-    public static PackingList stageData() {
+    public static ArrayList<PackingList> stageData() {
+
+        ArrayList<PackingList> packingLists = new ArrayList<>();
+
         PackingListItem packingListItem = new PackingListItem();
         packingListItem.setTitle("Shirt");
         packingListItem.setSubtitle("Apples");
-        packingListItem.setQuantity(1);
+        packingListItem.setQuantity("1");
 
         PackingListItem packingListItem2 = new PackingListItem();
         packingListItem2.setTitle("Pants");
         packingListItem2.setSubtitle("Bananas");
-        packingListItem2.setQuantity(2);
+        packingListItem2.setQuantity("2");
 
         PackingListItem packingListItem3 = new PackingListItem();
         packingListItem3.setTitle("Shoes");
         packingListItem3.setSubtitle("Coconuts");
-        packingListItem3.setQuantity(3);
+        packingListItem3.setQuantity("3");
 
         PackingList packingList = new PackingList();
+        packingList.setActive(false);
         packingList.setTitle("Overnight");
         ArrayList<PackingListItem> plist = new ArrayList<>();
         plist.add(packingListItem);
@@ -35,6 +39,17 @@ public final class Utils {
         plist.add(packingListItem3);
         packingList.setItems(plist);
 
-        return packingList;
+        PackingList packingList2 = new PackingList();
+        packingList2.setActive(false);
+        packingList2.setTitle("Arizona");
+        ArrayList<PackingListItem> plist2 = new ArrayList<>();
+        plist2.add(packingListItem2);
+        plist2.add(packingListItem3);
+        packingList2.setItems(plist2);
+
+        packingLists.add(packingList);
+        packingLists.add(packingList2);
+
+        return packingLists;
     }
 }

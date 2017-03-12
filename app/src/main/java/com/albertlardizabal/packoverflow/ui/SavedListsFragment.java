@@ -24,7 +24,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by albertlardizabal on 2/26/17.
@@ -37,9 +36,9 @@ public class SavedListsFragment extends Fragment {
     private RecyclerView recyclerView;
     private SavedListsAdapter adapter;
 
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference rootReference = firebaseDatabase.getReference();
-    private DatabaseReference savedListsReference = rootReference.child("saved_lists");
+    private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private static final DatabaseReference rootReference = firebaseDatabase.getReference();
+    private static final DatabaseReference savedListsReference = rootReference.child("saved_lists");
 
     @Nullable
     @Override
@@ -62,17 +61,17 @@ public class SavedListsFragment extends Fragment {
         PackingListItem packingListItem = new PackingListItem();
         packingListItem.setTitle("Shirt");
         packingListItem.setSubtitle("Apples");
-        packingListItem.setQuantity(1);
+        packingListItem.setQuantity("1");
 
         PackingListItem packingListItem2 = new PackingListItem();
         packingListItem.setTitle("Pants");
         packingListItem.setSubtitle("Bananas");
-        packingListItem.setQuantity(2);
+        packingListItem.setQuantity("2");
 
         PackingListItem packingListItem3 = new PackingListItem();
         packingListItem.setTitle("Shoes");
         packingListItem.setSubtitle("Coconuts");
-        packingListItem.setQuantity(3);
+        packingListItem.setQuantity("3");
 
         PackingList packingList = new PackingList();
         packingList.setTitle("Overnight");
@@ -120,7 +119,7 @@ public class SavedListsFragment extends Fragment {
     }
 
     private void updateUI() {
-        List<PackingList> listItems = new ArrayList<>();
+        ArrayList<PackingList> listItems = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             PackingList item = new PackingList();
             item.setTitle("Title");
@@ -165,9 +164,9 @@ public class SavedListsFragment extends Fragment {
 
     public class SavedListsAdapter extends RecyclerView.Adapter<SavedListsHolder> {
 
-        private List<PackingList> listItems;
+        private ArrayList<PackingList> listItems;
 
-        public SavedListsAdapter(List<PackingList> listItems) { this.listItems = listItems; }
+        public SavedListsAdapter(ArrayList<PackingList> listItems) { this.listItems = listItems; }
 
         @Override
         public SavedListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {

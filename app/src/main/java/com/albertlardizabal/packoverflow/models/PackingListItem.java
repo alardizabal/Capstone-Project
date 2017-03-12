@@ -29,7 +29,7 @@ public class PackingListItem implements Parcelable {
     private String bagType;
     @SerializedName("quantity")
     @Expose
-    private int quantity;
+    private String quantity;
 
     /**
      *
@@ -118,7 +118,7 @@ public class PackingListItem implements Parcelable {
      * @return
      * The quantity
      */
-    public int getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
 
@@ -127,7 +127,7 @@ public class PackingListItem implements Parcelable {
      * @param quantity
      * The quantity
      */
-    public void setQuantity(int quantity) {
+    public void setQuantity(String quantity) {
         this.quantity = quantity;
     }
 
@@ -139,10 +139,11 @@ public class PackingListItem implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(uid);
+        dest.writeByte((byte) (isChecked ? 1 : 0));
         dest.writeString(title);
         dest.writeString(subtitle);
         dest.writeString(bagType);
-        dest.writeInt(quantity);
+        dest.writeString(quantity);
     }
 
     public static final Parcelable.Creator<PackingListItem> CREATOR = new Parcelable.Creator<PackingListItem>() {

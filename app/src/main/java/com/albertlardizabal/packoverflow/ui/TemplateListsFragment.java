@@ -1,8 +1,10 @@
 package com.albertlardizabal.packoverflow.ui;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,9 +22,9 @@ import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.database.ListTemplateContract;
 import com.albertlardizabal.packoverflow.database.ListTemplateDbHelper;
 import com.albertlardizabal.packoverflow.models.PackingList;
+import com.albertlardizabal.packoverflow.models.PackingListItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by albertlardizabal on 3/9/17.
@@ -49,29 +51,17 @@ public class TemplateListsFragment extends Fragment {
 
         updateUI();
 
-        stageData();
-
         return view;
     }
 
-    private void stageData() {
-
-        // TODO - Wrap in AsyncTask
-        // Gets the data repository in write mode
-        dbHelper = new ListTemplateDbHelper(getContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        // Create a new map of values, where column names are the keys
-        ContentValues values = new ContentValues();
-        values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Scuba Diving Expedition");
-        values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
-
-        // Insert the new row, returning the primary key value of the new row
-        long newRowId = db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
+    @Override
+    public void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
     }
 
     private void updateUI() {
-        List<PackingList> listItems = new ArrayList<>();
+        ArrayList<PackingList> listItems = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             PackingList item = new PackingList();
             item.setTitle("Title");
@@ -79,6 +69,69 @@ public class TemplateListsFragment extends Fragment {
         }
         adapter = new TemplateListsAdapter(listItems);
         recyclerView.setAdapter(adapter);
+    }
+
+    private class ReadDatabase extends AsyncTask<Void, Void, Cursor> {
+
+        @Override
+        protected Cursor doInBackground(Void... params) {
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            String[] projection = {
+                    ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE,
+                    ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE,
+            };
+
+            Cursor cursor = db.query(
+                    ListTemplateContract.ListTemplateEntry.TABLE_NAME,      // Table to query
+                    projection,                                             // Columns to return
+                    null,                                                   // Columns for WHERE clause
+                    null,                                                   // Values for WHERE clause
+                    null,                                                   // Don't group rows
+                    null,                                                   // Don't filter by row groups
+                    null                                                    // The sort order
+            );
+
+            ArrayList<PackingList> packingLists = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                String packingListTitle = cursor.getString(
+                        cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE));
+                String packingListItemTitle = cursor.getString(
+                        cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE));
+
+                PackingListItem packingListItem = new PackingListItem();
+                packingListItem.setTitle(packingListItemTitle);
+
+                ArrayList<PackingListItem> items = new ArrayList<>();
+                items.add(packingListItem);
+
+                PackingList packingList = new PackingList();
+                packingList.setTitle(packingListTitle);
+                packingList.setItems(items);
+                packingLists.add(packingList);
+            }
+            cursor.close();
+            return cursor;
+        }
+    }
+
+    private class WriteDatabase extends AsyncTask<Void, Void, Cursor> {
+
+        @Override
+        protected Cursor doInBackground(Void... params) {
+            // Gets the data repository in write mode
+            dbHelper = new ListTemplateDbHelper(getContext());
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            // Create a new map of values, where column names are the keys
+            ContentValues values = new ContentValues();
+            values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Scuba Diving Expedition");
+            values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
+
+            // Insert the new row, returning the primary key value of the new row
+            long newRowId = db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
+            return null;
+        }
     }
 
     public class TemplateListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -116,9 +169,9 @@ public class TemplateListsFragment extends Fragment {
 
     public class TemplateListsAdapter extends RecyclerView.Adapter<TemplateListsHolder> {
 
-        private List<PackingList> listItems;
+        private ArrayList<PackingList> listItems;
 
-        public TemplateListsAdapter(List<PackingList> listItems) { this.listItems = listItems; }
+        public TemplateListsAdapter(ArrayList<PackingList> listItems) { this.listItems = listItems; }
 
         @Override
         public TemplateListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
