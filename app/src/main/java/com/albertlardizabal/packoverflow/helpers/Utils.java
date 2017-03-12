@@ -40,7 +40,7 @@ public final class Utils {
         packingList.setItems(plist);
 
         PackingList packingList2 = new PackingList();
-        packingList2.setActive(false);
+        packingList2.setActive(true);
         packingList2.setTitle("Arizona");
         ArrayList<PackingListItem> plist2 = new ArrayList<>();
         plist2.add(packingListItem2);

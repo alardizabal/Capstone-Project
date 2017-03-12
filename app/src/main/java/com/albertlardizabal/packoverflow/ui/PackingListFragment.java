@@ -3,6 +3,7 @@ package com.albertlardizabal.packoverflow.ui;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
+import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
@@ -38,8 +40,9 @@ public class PackingListFragment extends Fragment {
     private RecyclerView recyclerView;
     private PackingListAdapter adapter;
 
-    public static String currentPackingListTitle;
     public static ArrayList<PackingList> packingLists = new ArrayList<>();
+
+    public static PackingList currentPackingList = new PackingList();
     public static ArrayList<PackingListItem> currentListItems = new ArrayList<>();
 
     private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -65,6 +68,10 @@ public class PackingListFragment extends Fragment {
         return view;
     }
 
+    public static void updateFirebase() {
+        savedListsReference.setValue(packingLists);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -87,9 +94,10 @@ public class PackingListFragment extends Fragment {
                 packingLists.add(packingList);
 
                 if (packingList.isActive() == true) {
+                    currentPackingList = packingList;
                     currentListItems = packingList.getItems();
+                    MainActivity.toolbar.setTitle(currentPackingList.getTitle());
                 }
-
                 adapter.notifyDataSetChanged();
 
                 Log.d(LOG_TAG, "onChildAdded");
@@ -97,16 +105,19 @@ public class PackingListFragment extends Fragment {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                adapter.notifyDataSetChanged();
                 Log.d(LOG_TAG, "onChildChanged");
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                adapter.notifyDataSetChanged();
                 Log.d(LOG_TAG, "onChildRemoved");
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                adapter.notifyDataSetChanged();
                 Log.d(LOG_TAG, "onChildMoved");
             }
 
@@ -117,7 +128,7 @@ public class PackingListFragment extends Fragment {
         });
     }
 
-    public class PackingListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class PackingListHolder extends RecyclerView.ViewHolder {
 
         private PackingListItem listItem;
 
@@ -134,8 +145,6 @@ public class PackingListFragment extends Fragment {
             subtitle = (TextView) itemView.findViewById(R.id.list_item_subtitle);
             quantity = (TextView) itemView.findViewById(R.id.list_item_quantity);
 
-            itemView.setOnClickListener(this);
-
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -146,11 +155,6 @@ public class PackingListFragment extends Fragment {
 
         public void bind(PackingListItem packingListItem) {
             listItem = packingListItem;
-        }
-
-        @Override
-        public void onClick(View v) {
-
         }
     }
 
@@ -168,10 +172,22 @@ public class PackingListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(PackingListHolder holder, int position) {
-            PackingListItem listItem = PackingListFragment.currentListItems.get(position);
+            final PackingListItem listItem = PackingListFragment.currentListItems.get(position);
             holder.title.setText(listItem.getTitle());
             holder.subtitle.setText(listItem.getSubtitle());
-            holder.quantity.setText(listItem.getQuantity());
+            holder.quantity.setText("x" + listItem.getQuantity());
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Bundle itemBundle = new Bundle();
+                    itemBundle.putParcelable("listItem", listItem);
+                    DialogFragment dialogFragment = new EditItemDialogFragment();
+                    dialogFragment.setArguments(itemBundle);
+                    dialogFragment.show(getFragmentManager(), "editListItem");
+                }
+            });
         }
 
         @Override

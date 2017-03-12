@@ -11,8 +11,9 @@
 
     <string name="action_calendar">Calendar</string>
     <string name="action_share">Share</string>
+    <string name="action_new_list">New List</string>
     <string name="action_rename_list">Rename List</string>
-    <string name="action_delete_selected">Delete Selected</string>
+    <string name="action_delete_selected">Delete Selected Items</string>
     <string name="action_delete_list">Delete List</string>
 
     <string name="dialog_item_title_hint">Item Title</string>

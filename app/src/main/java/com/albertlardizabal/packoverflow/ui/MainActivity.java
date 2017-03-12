@@ -31,9 +31,11 @@ public class MainActivity extends AppCompatActivity
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private FirebaseAnalytics firebaseAnalytics;
+    public static Toolbar toolbar;
     private FloatingActionButton fab;
     private MenuItem calendarMenuItem;
     private MenuItem shareMenuItem;
+    private MenuItem newListMenuItem;
     private MenuItem renameListMenuItem;
     private MenuItem deleteSelectedMenuItem;
     private MenuItem deleteListMenuItem;
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -62,8 +64,7 @@ public class MainActivity extends AppCompatActivity
                     DialogFragment newFragment = new EditItemDialogFragment();
                     newFragment.show(getSupportFragmentManager(), "editListItem");
                 } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
-                    DialogFragment newFragment = new EditListDialogFragment();
-                    newFragment.show(getSupportFragmentManager(), "editList");
+                    makeNewList();
                 }
             }
         });
@@ -99,11 +100,40 @@ public class MainActivity extends AppCompatActivity
 
         calendarMenuItem = menu.findItem(R.id.action_calendar);
         shareMenuItem = menu.findItem(R.id.action_share);
+
+        newListMenuItem = menu.findItem(R.id.action_new_list);
         renameListMenuItem = menu.findItem(R.id.action_rename_list);
         deleteSelectedMenuItem = menu.findItem(R.id.action_delete_selected);
         deleteListMenuItem = menu.findItem(R.id.action_delete_list);
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_calendar) {
+            return true;
+        } else if (id == R.id.action_share) {
+            setShareIntent();
+            return true;
+        } else if (id == R.id.action_new_list) {
+            makeNewList();
+            return true;
+        } else if (id == R.id.action_rename_list) {
+            return true;
+        } else if (id == R.id.action_delete_selected) {
+            return true;
+        } else if (id == R.id.action_delete_list) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     // Call to update the share intent
@@ -123,28 +153,9 @@ public class MainActivity extends AppCompatActivity
         startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_list_title)));
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_calendar) {
-            return true;
-        } else if (id == R.id.action_share) {
-            setShareIntent();
-            return true;
-        } else if (id == R.id.action_rename_list) {
-
-        } else if (id == R.id.action_delete_selected) {
-            return true;
-        } else if (id == R.id.action_delete_list) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    private void makeNewList() {
+        DialogFragment newFragment = new EditListDialogFragment();
+        newFragment.show(getSupportFragmentManager(), "editList");
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -163,6 +174,7 @@ public class MainActivity extends AppCompatActivity
             fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
             showMenuItems();
+            newListMenuItem.setVisible(true);
             renameListMenuItem.setVisible(true);
             deleteListMenuItem.setVisible(true);
         } else if (id == R.id.nav_saved_lists) {
@@ -170,6 +182,7 @@ public class MainActivity extends AppCompatActivity
             fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
             hideMenuItems();
+            newListMenuItem.setVisible(false);
             renameListMenuItem.setVisible(false);
             deleteListMenuItem.setVisible(false);
         } else if (id == R.id.nav_template_lists) {
@@ -177,6 +190,7 @@ public class MainActivity extends AppCompatActivity
             fab.setVisibility(View.GONE);
             CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
             hideMenuItems();
+            newListMenuItem.setVisible(false);
             renameListMenuItem.setVisible(false);
             deleteListMenuItem.setVisible(false);
         }
