@@ -47,8 +47,18 @@ public final class Utils {
         plist2.add(packingListItem3);
         packingList2.setItems(plist2);
 
+        PackingList packingList3 = new PackingList();
+        packingList3.setActive(false);
+        packingList3.setTitle("Beach");
+        ArrayList<PackingListItem> plist3 = new ArrayList<>();
+        plist3.add(packingListItem);
+        plist3.add(packingListItem2);
+        plist3.add(packingListItem3);
+        packingList3.setItems(plist3);
+
         packingLists.add(packingList);
         packingLists.add(packingList2);
+        packingLists.add(packingList3);
 
         return packingLists;
     }

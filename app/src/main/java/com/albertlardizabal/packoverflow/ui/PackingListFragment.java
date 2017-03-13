@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
@@ -75,6 +74,8 @@ public class PackingListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        packingLists.clear();
+
         savedListsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -105,6 +106,13 @@ public class PackingListFragment extends Fragment {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                PackingList packingList = dataSnapshot.getValue(PackingList.class);
+                for (int i = 0; i < packingLists.size(); i++) {
+                    PackingList matchList = packingLists.get(i);
+                    if (matchList.getTitle() == packingList.getTitle()) {
+                        packingLists.set(i, packingList);
+                    }
+                }
                 adapter.notifyDataSetChanged();
                 Log.d(LOG_TAG, "onChildChanged");
             }
@@ -144,13 +152,6 @@ public class PackingListFragment extends Fragment {
             title = (TextView) itemView.findViewById(R.id.list_item_title);
             subtitle = (TextView) itemView.findViewById(R.id.list_item_subtitle);
             quantity = (TextView) itemView.findViewById(R.id.list_item_quantity);
-
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Log.d(LOG_TAG, "tapped");
-                }
-            });
         }
 
         public void bind(PackingListItem packingListItem) {
@@ -171,11 +172,29 @@ public class PackingListFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(PackingListHolder holder, int position) {
+        public void onBindViewHolder(PackingListHolder holder, final int position) {
             final PackingListItem listItem = PackingListFragment.currentListItems.get(position);
             holder.title.setText(listItem.getTitle());
             holder.subtitle.setText(listItem.getSubtitle());
             holder.quantity.setText("x" + listItem.getQuantity());
+            System.out.println("Checked " + position + " " + listItem.getIsChecked());
+            holder.checkBox.setChecked(listItem.getIsChecked());
+
+            holder.checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    for (int i = 0; i < packingLists.size(); i++) {
+                        if (packingLists.get(i).getTitle() == currentPackingList.getTitle()) {
+                            PackingList list = packingLists.get(i);
+                            PackingListItem item = list.getItems().get(position);
+                            boolean itemChecked = item.getIsChecked();
+                            item.setIsChecked(!item.getIsChecked());
+//                            updateFirebase();
+                            return;
+                        }
+                    }
+                }
+            });
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
 

@@ -28,6 +28,7 @@
         android:layout_toEndOf="@+id/list_item_checkbox"
         android:layout_toLeftOf="@+id/list_item_quantity"
         android:layout_toStartOf="@+id/list_item_quantity"
+        android:textStyle="bold"
         android:text="Title"/>
 
     <TextView android:id="@+id/list_item_subtitle"

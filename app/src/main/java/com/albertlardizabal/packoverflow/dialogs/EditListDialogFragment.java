@@ -59,8 +59,15 @@ public class EditListDialogFragment extends DialogFragment {
                                 newList.setTitle(title.getText().toString());
                             }
                             lists.add(newList);
-                            PackingListFragment.updateFirebase();
+                        } else {
+                            for (int i = 0; i < lists.size(); i++) {
+                                PackingList tempList = lists.get(i);
+                                if (tempList.getTitle().equals(list.getTitle())) {
+                                    tempList.setTitle(title.getText().toString());
+                                }
+                            }
                         }
+                        PackingListFragment.updateFirebase();
                     }
                 })
                 .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {

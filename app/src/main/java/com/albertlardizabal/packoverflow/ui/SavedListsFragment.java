@@ -50,7 +50,8 @@ public class SavedListsFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.saved_lists_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        updateUI();
+        adapter = new SavedListsAdapter(PackingListFragment.packingLists);
+        recyclerView.setAdapter(adapter);
 
         stageData();
 
@@ -125,8 +126,6 @@ public class SavedListsFragment extends Fragment {
             item.setTitle("Title");
             listItems.add(item);
         }
-        adapter = new SavedListsAdapter(listItems);
-        recyclerView.setAdapter(adapter);
     }
 
     public class SavedListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

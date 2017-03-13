@@ -20,6 +20,7 @@ import android.view.View;
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
+import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -126,10 +127,13 @@ public class MainActivity extends AppCompatActivity
             makeNewList();
             return true;
         } else if (id == R.id.action_rename_list) {
+            renameList();
             return true;
         } else if (id == R.id.action_delete_selected) {
+            deleteSelectedItems();
             return true;
         } else if (id == R.id.action_delete_list) {
+            deleteList();
             return true;
         }
 
@@ -154,8 +158,59 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void makeNewList() {
-        DialogFragment newFragment = new EditListDialogFragment();
-        newFragment.show(getSupportFragmentManager(), "editList");
+        DialogFragment dialogFragment = new EditListDialogFragment();
+        dialogFragment.show(getSupportFragmentManager(), "newList");
+    }
+
+    private void renameList() {
+        Bundle itemBundle = new Bundle();
+        itemBundle.putParcelable("packingList", PackingListFragment.currentPackingList);
+        DialogFragment dialogFragment = new EditListDialogFragment();
+        dialogFragment.setArguments(itemBundle);
+        dialogFragment.show(getSupportFragmentManager(), "editList");
+    }
+
+    private void deleteSelectedItems() {
+        ArrayList<PackingList> lists = PackingListFragment.packingLists;
+        if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
+            for (int i = 0; i < lists.size(); i++) {
+                PackingList list = lists.get(i);
+                if (list.getTitle() == PackingListFragment.currentPackingList.getTitle()) {
+                    for (int j = list.getItems().size() - 1; j >= 0; j--) {
+                        PackingListItem deleteItem = list.getItems().get(j);
+                        if (deleteItem.getIsChecked()) {
+                            list.getItems().remove(j);
+                        }
+                    }
+                    PackingListFragment.updateFirebase();
+                    return;
+                }
+            }
+        } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
+            for (int j = lists.size(); j >= 0; j--) {
+                PackingList deleteList = lists.get(j);
+                if (deleteList.getIsChecked()) {
+                    lists.remove(j);
+                }
+            }
+        }
+    }
+
+    private void deleteList() {
+        ArrayList<PackingList> lists = PackingListFragment.packingLists;
+        for (int i = 0; i < lists.size(); i++) {
+            PackingList list = lists.get(i);
+            if (list.getTitle() == PackingListFragment.currentPackingList.getTitle()) {
+                for (int j = list.getItems().size() - 1; j >= 0; j--) {
+                    PackingListItem deleteItem = list.getItems().get(j);
+                    if (deleteItem.getIsChecked()) {
+                        list.getItems().remove(j);
+                    }
+                }
+                PackingListFragment.updateFirebase();
+                return;
+            }
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
