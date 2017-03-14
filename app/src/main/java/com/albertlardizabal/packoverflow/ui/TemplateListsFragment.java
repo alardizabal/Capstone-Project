@@ -35,7 +35,6 @@ public class TemplateListsFragment extends Fragment {
 
     private ArrayList<PackingList> lists = new ArrayList<>();
 
-    private RecyclerView recyclerView;
     private TemplateListsAdapter adapter;
 
     @Nullable
@@ -45,7 +44,7 @@ public class TemplateListsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_template_lists, container, false);
         view.setBackgroundColor(Color.WHITE);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.template_lists_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.template_lists_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         adapter = new TemplateListsAdapter(lists);

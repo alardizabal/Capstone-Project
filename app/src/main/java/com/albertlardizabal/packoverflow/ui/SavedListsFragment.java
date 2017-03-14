@@ -31,7 +31,6 @@ public class SavedListsFragment extends Fragment {
 
     private static final String LOG_TAG = SavedListsFragment.class.getSimpleName();
 
-    private RecyclerView recyclerView;
     public static SavedListsAdapter adapter;
 
     @Nullable
@@ -41,7 +40,7 @@ public class SavedListsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_saved_lists, container, false);
         view.setBackgroundColor(Color.WHITE);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.saved_lists_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.saved_lists_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         adapter = new SavedListsAdapter(PackingListFragment.packingLists);
@@ -50,14 +49,14 @@ public class SavedListsFragment extends Fragment {
         return view;
     }
 
-    public class SavedListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class SavedListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private PackingList listItem;
 
         private CheckBox checkBox;
         private TextView title;
 
-        public SavedListsHolder(LayoutInflater inflater, ViewGroup parent) {
+        private SavedListsHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.saved_list_item, parent, false));
 
             checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);

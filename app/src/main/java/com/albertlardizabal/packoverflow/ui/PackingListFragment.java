@@ -35,7 +35,6 @@ public class PackingListFragment extends Fragment {
 
     private static final String LOG_TAG = PackingListFragment.class.getSimpleName();
 
-    private RecyclerView recyclerView;
     public static PackingListAdapter adapter;
 
     public static ArrayList<PackingList> packingLists = new ArrayList<>();
@@ -54,7 +53,7 @@ public class PackingListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_packing_list, container, false);
         view.setBackgroundColor(Color.WHITE);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.packing_list_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.packing_list_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         adapter = new PackingListAdapter(currentListItems);
@@ -64,7 +63,9 @@ public class PackingListFragment extends Fragment {
     }
 
     public static void updateFirebase() {
-        savedListsReference.setValue(packingLists);
+        for (PackingList list : packingLists) {
+            savedListsReference.child(list.getTitle()).setValue(list);
+        }
     }
 
     @Override

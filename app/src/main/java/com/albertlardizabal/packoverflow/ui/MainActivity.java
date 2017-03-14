@@ -20,6 +20,7 @@ import android.view.View;
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
+import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import static com.albertlardizabal.packoverflow.ui.PackingListFragment.currentPackingList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -88,8 +89,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // TODO - Stage data
-//        ArrayList<PackingList> savedLists = Utils.stageData();
-//        PackingListFragment.savedListsReference.setValue(savedLists);
+        ArrayList<PackingList> savedLists = Utils.stageData();
+        for (PackingList list : savedLists) {
+            PackingListFragment.savedListsReference.child(list.getTitle()).setValue(list);
+        }
     }
 
     @Override
@@ -115,17 +118,21 @@ public class MainActivity extends AppCompatActivity
         deleteSelectedMenuItem = menu.findItem(R.id.action_delete_selected);
         deleteListMenuItem = menu.findItem(R.id.action_delete_list);
 
+        if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
+            configureViewForPackingListFragment();
+        } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
+            configureViewForSavedListsFragment();
+        } else if (CURRENT_FRAGMENT == TEMPLATE_LISTS_FRAGMENT) {
+            configureViewForTemplateListsFragment();
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_calendar) {
             return true;
         } else if (id == R.id.action_share) {
@@ -144,11 +151,9 @@ public class MainActivity extends AppCompatActivity
             deleteList();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    // Call to update the share intent
     private void setShareIntent() {
         ArrayList<PackingListItem> list = PackingListFragment.currentListItems;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -202,7 +207,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
             PackingListFragment.updateFirebase();
-            return;
         }
     }
 
@@ -227,7 +231,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_current_list) {
@@ -247,33 +250,16 @@ public class MainActivity extends AppCompatActivity
 
         if (fragmentId == PACKING_LIST_FRAGMENT) {
             fragment = new PackingListFragment();
-            fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
-            showMenuItems();
-            newListMenuItem.setVisible(true);
-            renameListMenuItem.setVisible(true);
-            deleteListMenuItem.setVisible(true);
-            deleteSelectedMenuItem.setVisible(true);
+            configureViewForPackingListFragment();
         } else if (fragmentId == SAVED_LISTS_FRAGMENT) {
-            MainActivity.toolbar.setTitle(R.string.saved_lists);
             fragment = new SavedListsFragment();
-            fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
-            hideMenuItems();
-            newListMenuItem.setVisible(false);
-            renameListMenuItem.setVisible(false);
-            deleteListMenuItem.setVisible(false);
-            deleteSelectedMenuItem.setVisible(true);
+            configureViewForSavedListsFragment();
         } else if (fragmentId == TEMPLATE_LISTS_FRAGMENT) {
-            MainActivity.toolbar.setTitle(R.string.template_lists);
             fragment = new TemplateListsFragment();
-            fab.setVisibility(View.GONE);
             CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
-            hideMenuItems();
-            newListMenuItem.setVisible(false);
-            renameListMenuItem.setVisible(false);
-            deleteListMenuItem.setVisible(false);
-            deleteSelectedMenuItem.setVisible(false);
+            configureViewForTemplateListsFragment();
         }
 
         transaction.replace(R.id.content_main, fragment);
@@ -282,6 +268,35 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    private void configureViewForPackingListFragment() {
+        fab.setVisibility(View.VISIBLE);
+        showMenuItems();
+        newListMenuItem.setVisible(true);
+        renameListMenuItem.setVisible(true);
+        deleteListMenuItem.setVisible(true);
+        deleteSelectedMenuItem.setVisible(true);
+    }
+
+    private void configureViewForSavedListsFragment() {
+        toolbar.setTitle(R.string.saved_lists);
+        fab.setVisibility(View.VISIBLE);
+        hideMenuItems();
+        newListMenuItem.setVisible(false);
+        renameListMenuItem.setVisible(false);
+        deleteListMenuItem.setVisible(false);
+        deleteSelectedMenuItem.setVisible(true);
+    }
+
+    private void configureViewForTemplateListsFragment() {
+        toolbar.setTitle(R.string.template_lists);
+        fab.setVisibility(View.GONE);
+        hideMenuItems();
+        newListMenuItem.setVisible(false);
+        renameListMenuItem.setVisible(false);
+        deleteListMenuItem.setVisible(false);
+        deleteSelectedMenuItem.setVisible(false);
     }
 
     private void showMenuItems() {
