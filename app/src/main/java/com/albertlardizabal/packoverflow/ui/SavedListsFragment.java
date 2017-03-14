@@ -3,7 +3,10 @@ package com.albertlardizabal.packoverflow.ui;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,13 +18,8 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
+import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
 import com.albertlardizabal.packoverflow.models.PackingList;
-import com.albertlardizabal.packoverflow.models.PackingListItem;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -34,18 +32,14 @@ public class SavedListsFragment extends Fragment {
     private static final String LOG_TAG = SavedListsFragment.class.getSimpleName();
 
     private RecyclerView recyclerView;
-    private SavedListsAdapter adapter;
-
-    private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private static final DatabaseReference rootReference = firebaseDatabase.getReference();
-    private static final DatabaseReference savedListsReference = rootReference.child("saved_lists");
+    public static SavedListsAdapter adapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_saved_lists, container, false);
-        view.setBackgroundColor(Color.GREEN);
+        view.setBackgroundColor(Color.WHITE);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.saved_lists_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -53,79 +47,7 @@ public class SavedListsFragment extends Fragment {
         adapter = new SavedListsAdapter(PackingListFragment.packingLists);
         recyclerView.setAdapter(adapter);
 
-        stageData();
-
         return view;
-    }
-
-    private void stageData() {
-        PackingListItem packingListItem = new PackingListItem();
-        packingListItem.setTitle("Shirt");
-        packingListItem.setSubtitle("Apples");
-        packingListItem.setQuantity("1");
-
-        PackingListItem packingListItem2 = new PackingListItem();
-        packingListItem.setTitle("Pants");
-        packingListItem.setSubtitle("Bananas");
-        packingListItem.setQuantity("2");
-
-        PackingListItem packingListItem3 = new PackingListItem();
-        packingListItem.setTitle("Shoes");
-        packingListItem.setSubtitle("Coconuts");
-        packingListItem.setQuantity("3");
-
-        PackingList packingList = new PackingList();
-        packingList.setTitle("Overnight");
-
-        ArrayList<PackingListItem> itemList = new ArrayList<>();
-        itemList.add(packingListItem);
-        itemList.add(packingListItem2);
-        itemList.add(packingListItem3);
-
-        packingList.setItems(itemList);
-
-        savedListsReference.push().setValue(packingListItem);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        savedListsReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                List<PackingList> packingListItems = (List) dataSnapshot.getChildren();
-                System.out.print("Hello");
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void updateUI() {
-        ArrayList<PackingList> listItems = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            PackingList item = new PackingList();
-            item.setTitle("Title");
-            listItems.add(item);
-        }
     }
 
     public class SavedListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -163,9 +85,11 @@ public class SavedListsFragment extends Fragment {
 
     public class SavedListsAdapter extends RecyclerView.Adapter<SavedListsHolder> {
 
-        private ArrayList<PackingList> listItems;
+        private ArrayList<PackingList> lists;
 
-        public SavedListsAdapter(ArrayList<PackingList> listItems) { this.listItems = listItems; }
+        public SavedListsAdapter(ArrayList<PackingList> lists) {
+            this.lists = lists;
+        }
 
         @Override
         public SavedListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -174,12 +98,72 @@ public class SavedListsFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(SavedListsHolder holder, int position) {
-            PackingList listItem = listItems.get(position);
-            holder.bind(listItem);
+        public void onBindViewHolder(SavedListsHolder holder, final int position) {
+
+            final PackingList list = lists.get(position);
+
+            holder.title.setText(list.getTitle());
+
+            holder.checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    for (int i = 0; i < lists.size(); i++) {
+                        if (lists.get(i).getTitle() == list.getTitle()) {
+                            list.setIsChecked(!list.getIsChecked());
+                            return;
+                        }
+                    }
+                }
+            });
+
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+
+                @Override
+                public boolean onLongClick(View v) {
+                    Bundle itemBundle = new Bundle();
+                    itemBundle.putParcelable("packingList", list);
+                    DialogFragment dialogFragment = new EditListDialogFragment();
+                    dialogFragment.setArguments(itemBundle);
+                    dialogFragment.show(getFragmentManager(), "editList");
+                    Log.d(LOG_TAG, "Long press");
+                    return false;
+                }
+            });
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+
+//                    navigateToPackingListFragment();
+                    PackingListFragment.currentPackingList = list;
+                    PackingListFragment.currentListItems = list.getItems();
+                    PackingListFragment.adapter.notifyDataSetChanged();
+                    getFragmentManager().popBackStack();
+                }
+            });
         }
 
         @Override
-        public int getItemCount() { return listItems.size(); }
+        public int getItemCount() { return lists.size(); }
     }
+
+    private void navigateToPackingListFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        Fragment fragment = new PackingListFragment();
+//        fab.setVisibility(View.VISIBLE);
+//        CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
+//        showMenuItems();
+//        newListMenuItem.setVisible(true);
+//        renameListMenuItem.setVisible(true);
+//        deleteListMenuItem.setVisible(true);
+
+        transaction.replace(R.id.content_main, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 }

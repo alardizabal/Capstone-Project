@@ -20,6 +20,7 @@ import android.view.View;
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
+import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -32,8 +33,10 @@ public class MainActivity extends AppCompatActivity
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private FirebaseAnalytics firebaseAnalytics;
+
     public static Toolbar toolbar;
     private FloatingActionButton fab;
+
     private MenuItem calendarMenuItem;
     private MenuItem shareMenuItem;
     private MenuItem newListMenuItem;
@@ -43,11 +46,11 @@ public class MainActivity extends AppCompatActivity
 
     private static final int RC_SIGN_IN = 123;
 
-    private static final int PACKING_LIST_FRAGMENT = 1000;
-    private static final int SAVED_LISTS_FRAGMENT = 1001;
-    private static final int TEMPLATE_LISTS_FRAGMENT = 1002;
+    public static final int PACKING_LIST_FRAGMENT = 1000;
+    public static final int SAVED_LISTS_FRAGMENT = 1001;
+    public static final int TEMPLATE_LISTS_FRAGMENT = 1002;
 
-    private static int CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
+    public static int CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +85,10 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // TODO - Stage data
+        ArrayList<PackingList> savedLists = Utils.stageData();
+        PackingListFragment.savedListsReference.setValue(savedLists);
     }
 
     @Override
@@ -187,12 +194,14 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
-            for (int j = lists.size(); j >= 0; j--) {
+            for (int j = lists.size() - 1; j >= 0; j--) {
                 PackingList deleteList = lists.get(j);
                 if (deleteList.getIsChecked()) {
                     lists.remove(j);
                 }
             }
+            PackingListFragment.updateFirebase();
+            return;
         }
     }
 
@@ -200,7 +209,7 @@ public class MainActivity extends AppCompatActivity
         ArrayList<PackingList> lists = PackingListFragment.packingLists;
         for (int i = 0; i < lists.size(); i++) {
             PackingList list = lists.get(i);
-            if (list.getTitle() == PackingListFragment.currentPackingList.getTitle()) {
+            if (list.getTitle().equals(PackingListFragment.currentPackingList.getTitle())) {
                 for (int j = list.getItems().size() - 1; j >= 0; j--) {
                     PackingListItem deleteItem = list.getItems().get(j);
                     if (deleteItem.getIsChecked()) {
@@ -217,14 +226,25 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        Fragment fragment = new Fragment();
-
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_current_list) {
+            navigateToFragment(PACKING_LIST_FRAGMENT);
+        } else if (id == R.id.nav_saved_lists) {
+            navigateToFragment(SAVED_LISTS_FRAGMENT);
+        } else if (id == R.id.nav_template_lists) {
+            navigateToFragment(TEMPLATE_LISTS_FRAGMENT);
+        }
+        return true;
+    }
+
+    private void navigateToFragment(int fragmentId) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        Fragment fragment = new Fragment();
+
+        if (fragmentId == PACKING_LIST_FRAGMENT) {
             fragment = new PackingListFragment();
             fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
@@ -232,7 +252,7 @@ public class MainActivity extends AppCompatActivity
             newListMenuItem.setVisible(true);
             renameListMenuItem.setVisible(true);
             deleteListMenuItem.setVisible(true);
-        } else if (id == R.id.nav_saved_lists) {
+        } else if (fragmentId == SAVED_LISTS_FRAGMENT) {
             fragment = new SavedListsFragment();
             fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
@@ -240,7 +260,7 @@ public class MainActivity extends AppCompatActivity
             newListMenuItem.setVisible(false);
             renameListMenuItem.setVisible(false);
             deleteListMenuItem.setVisible(false);
-        } else if (id == R.id.nav_template_lists) {
+        } else if (fragmentId == TEMPLATE_LISTS_FRAGMENT) {
             fragment = new TemplateListsFragment();
             fab.setVisibility(View.GONE);
             CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
@@ -256,7 +276,6 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     private void showMenuItems() {

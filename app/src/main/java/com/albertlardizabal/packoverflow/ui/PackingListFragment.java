@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
-import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.database.ChildEventListener;
@@ -37,7 +36,7 @@ public class PackingListFragment extends Fragment {
     private static final String LOG_TAG = PackingListFragment.class.getSimpleName();
 
     private RecyclerView recyclerView;
-    private PackingListAdapter adapter;
+    public static PackingListAdapter adapter;
 
     public static ArrayList<PackingList> packingLists = new ArrayList<>();
 
@@ -46,7 +45,7 @@ public class PackingListFragment extends Fragment {
 
     private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private static final DatabaseReference rootReference = firebaseDatabase.getReference();
-    private static final DatabaseReference savedListsReference = rootReference.child("saved_lists");
+    public static final DatabaseReference savedListsReference = rootReference.child("saved_lists");
 
     @Nullable
     @Override
@@ -60,9 +59,6 @@ public class PackingListFragment extends Fragment {
 
         adapter = new PackingListAdapter(currentListItems);
         recyclerView.setAdapter(adapter);
-
-        ArrayList<PackingList> savedLists = Utils.stageData();
-        savedListsReference.setValue(savedLists);
 
         return view;
     }
@@ -119,7 +115,15 @@ public class PackingListFragment extends Fragment {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                PackingList removedList = dataSnapshot.getValue(PackingList.class);
+//                for (int i = 0; i < packingLists.size(); i++) {
+//                    PackingList list = packingLists.get(i);
+//                    if (list.getTitle().equals(removedList.getTitle())) {
+//
+//                    }
+//                }
                 adapter.notifyDataSetChanged();
+                SavedListsFragment.adapter.notifyDataSetChanged();
                 Log.d(LOG_TAG, "onChildRemoved");
             }
 
@@ -173,7 +177,9 @@ public class PackingListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(PackingListHolder holder, final int position) {
+
             final PackingListItem listItem = PackingListFragment.currentListItems.get(position);
+
             holder.title.setText(listItem.getTitle());
             holder.subtitle.setText(listItem.getSubtitle());
             holder.quantity.setText("x" + listItem.getQuantity());
@@ -187,7 +193,6 @@ public class PackingListFragment extends Fragment {
                         if (packingLists.get(i).getTitle() == currentPackingList.getTitle()) {
                             PackingList list = packingLists.get(i);
                             PackingListItem item = list.getItems().get(position);
-                            boolean itemChecked = item.getIsChecked();
                             item.setIsChecked(!item.getIsChecked());
 //                            updateFirebase();
                             return;
