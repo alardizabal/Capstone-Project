@@ -109,7 +109,7 @@ public class SavedListsFragment extends Fragment {
                 public void onClick(View v) {
 
                     for (int i = 0; i < lists.size(); i++) {
-                        if (lists.get(i).getTitle() == list.getTitle()) {
+                        if (lists.get(i).getTitle().equals(list.getTitle())) {
                             list.setIsChecked(!list.getIsChecked());
                             return;
                         }
@@ -136,11 +136,17 @@ public class SavedListsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-//                    navigateToPackingListFragment();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                    PackingListFragment fragment = new PackingListFragment();
                     PackingListFragment.currentPackingList = list;
                     PackingListFragment.currentListItems = list.getItems();
                     PackingListFragment.adapter.notifyDataSetChanged();
-                    getFragmentManager().popBackStack();
+
+                    transaction.replace(R.id.content_main, fragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
                 }
             });
         }

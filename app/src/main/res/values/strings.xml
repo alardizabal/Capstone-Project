@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Pack Overflow</string>
 
+    <string name="placeholder_title">Title</string>
+
     <string name="current_list">Active Packing List</string>
     <string name="saved_lists">Saved Lists</string>
     <string name="template_lists">List Templates</string>

@@ -10,12 +10,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
@@ -36,6 +33,8 @@ public class TemplateListsFragment extends Fragment {
 
     private ListTemplateDbHelper dbHelper;
 
+    private ArrayList<PackingList> lists = new ArrayList<>();
+
     private RecyclerView recyclerView;
     private TemplateListsAdapter adapter;
 
@@ -44,12 +43,15 @@ public class TemplateListsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_template_lists, container, false);
-        view.setBackgroundColor(Color.CYAN);
+        view.setBackgroundColor(Color.WHITE);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.template_lists_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        updateUI();
+        adapter = new TemplateListsAdapter(lists);
+        recyclerView.setAdapter(adapter);
+
+        new ReadDatabaseTask().execute();
 
         return view;
     }
@@ -60,21 +62,11 @@ public class TemplateListsFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void updateUI() {
-        ArrayList<PackingList> listItems = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            PackingList item = new PackingList();
-            item.setTitle("Title");
-            listItems.add(item);
-        }
-        adapter = new TemplateListsAdapter(listItems);
-        recyclerView.setAdapter(adapter);
-    }
-
-    private class ReadDatabase extends AsyncTask<Void, Void, Cursor> {
+    private class ReadDatabaseTask extends AsyncTask<Void, Void, Cursor> {
 
         @Override
         protected Cursor doInBackground(Void... params) {
+            dbHelper = new ListTemplateDbHelper(getContext());
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             String[] projection = {
@@ -110,12 +102,22 @@ public class TemplateListsFragment extends Fragment {
                 packingList.setItems(items);
                 packingLists.add(packingList);
             }
+            lists = packingLists;
             cursor.close();
             return cursor;
         }
+
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            if (lists.size() == 0) {
+                new WriteDatabaseTask().execute();
+            } else {
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
-    private class WriteDatabase extends AsyncTask<Void, Void, Cursor> {
+    private class WriteDatabaseTask extends AsyncTask<Void, Void, Cursor> {
 
         @Override
         protected Cursor doInBackground(Void... params) {
@@ -128,9 +130,29 @@ public class TemplateListsFragment extends Fragment {
             values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Scuba Diving Expedition");
             values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
 
+            ContentValues values2 = new ContentValues();
+            values2.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Annual Ski Trip");
+            values2.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Skis");
+
+            ContentValues values3 = new ContentValues();
+            values3.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Indoor Rock Climbing");
+            values3.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Harness");
+
+            ContentValues values4 = new ContentValues();
+            values4.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Skydiving");
+            values4.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Parachute");
+
             // Insert the new row, returning the primary key value of the new row
-            long newRowId = db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
+            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
+            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values2);
+            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values3);
+            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values4);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            new ReadDatabaseTask().execute();
         }
     }
 
@@ -138,23 +160,14 @@ public class TemplateListsFragment extends Fragment {
 
         private PackingList listItem;
 
-        private CheckBox checkBox;
         private TextView title;
 
         public TemplateListsHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.saved_list_item, parent, false));
+            super(inflater.inflate(R.layout.template_list_item, parent, false));
 
-            checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
-            title = (TextView) itemView.findViewById(R.id.saved_list_item_title);
+            title = (TextView) itemView.findViewById(R.id.template_list_item_title);
 
             itemView.setOnClickListener(this);
-
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Log.d(LOG_TAG, "tapped");
-                }
-            });
         }
 
         public void bind(PackingList packingList) {
@@ -169,9 +182,7 @@ public class TemplateListsFragment extends Fragment {
 
     public class TemplateListsAdapter extends RecyclerView.Adapter<TemplateListsHolder> {
 
-        private ArrayList<PackingList> listItems;
-
-        public TemplateListsAdapter(ArrayList<PackingList> listItems) { this.listItems = listItems; }
+        public TemplateListsAdapter(ArrayList<PackingList> listItems) { lists = listItems; }
 
         @Override
         public TemplateListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -181,11 +192,11 @@ public class TemplateListsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(TemplateListsHolder holder, int position) {
-            PackingList listItem = listItems.get(position);
-            holder.bind(listItem);
+            PackingList listItem = lists.get(position);
+            holder.title.setText(listItem.getTitle());
         }
 
         @Override
-        public int getItemCount() { return listItems.size(); }
+        public int getItemCount() { return lists.size(); }
     }
 }

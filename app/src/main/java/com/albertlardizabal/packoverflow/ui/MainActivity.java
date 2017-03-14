@@ -20,12 +20,13 @@ import android.view.View;
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
-import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
+
+import static com.albertlardizabal.packoverflow.ui.PackingListFragment.currentPackingList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -87,8 +88,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // TODO - Stage data
-        ArrayList<PackingList> savedLists = Utils.stageData();
-        PackingListFragment.savedListsReference.setValue(savedLists);
+//        ArrayList<PackingList> savedLists = Utils.stageData();
+//        PackingListFragment.savedListsReference.setValue(savedLists);
     }
 
     @Override
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity
 
     private void renameList() {
         Bundle itemBundle = new Bundle();
-        itemBundle.putParcelable("packingList", PackingListFragment.currentPackingList);
+        itemBundle.putParcelable("packingList", currentPackingList);
         DialogFragment dialogFragment = new EditListDialogFragment();
         dialogFragment.setArguments(itemBundle);
         dialogFragment.show(getSupportFragmentManager(), "editList");
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity
         if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
             for (int i = 0; i < lists.size(); i++) {
                 PackingList list = lists.get(i);
-                if (list.getTitle() == PackingListFragment.currentPackingList.getTitle()) {
+                if (list.getTitle().equals(currentPackingList.getTitle())) {
                     for (int j = list.getItems().size() - 1; j >= 0; j--) {
                         PackingListItem deleteItem = list.getItems().get(j);
                         if (deleteItem.getIsChecked()) {
@@ -209,7 +210,7 @@ public class MainActivity extends AppCompatActivity
         ArrayList<PackingList> lists = PackingListFragment.packingLists;
         for (int i = 0; i < lists.size(); i++) {
             PackingList list = lists.get(i);
-            if (list.getTitle().equals(PackingListFragment.currentPackingList.getTitle())) {
+            if (list.getTitle().equals(currentPackingList.getTitle())) {
                 for (int j = list.getItems().size() - 1; j >= 0; j--) {
                     PackingListItem deleteItem = list.getItems().get(j);
                     if (deleteItem.getIsChecked()) {
@@ -252,7 +253,9 @@ public class MainActivity extends AppCompatActivity
             newListMenuItem.setVisible(true);
             renameListMenuItem.setVisible(true);
             deleteListMenuItem.setVisible(true);
+            deleteSelectedMenuItem.setVisible(true);
         } else if (fragmentId == SAVED_LISTS_FRAGMENT) {
+            MainActivity.toolbar.setTitle(R.string.saved_lists);
             fragment = new SavedListsFragment();
             fab.setVisibility(View.VISIBLE);
             CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
@@ -260,7 +263,9 @@ public class MainActivity extends AppCompatActivity
             newListMenuItem.setVisible(false);
             renameListMenuItem.setVisible(false);
             deleteListMenuItem.setVisible(false);
+            deleteSelectedMenuItem.setVisible(true);
         } else if (fragmentId == TEMPLATE_LISTS_FRAGMENT) {
+            MainActivity.toolbar.setTitle(R.string.template_lists);
             fragment = new TemplateListsFragment();
             fab.setVisibility(View.GONE);
             CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
@@ -268,6 +273,7 @@ public class MainActivity extends AppCompatActivity
             newListMenuItem.setVisible(false);
             renameListMenuItem.setVisible(false);
             deleteListMenuItem.setVisible(false);
+            deleteSelectedMenuItem.setVisible(false);
         }
 
         transaction.replace(R.id.content_main, fragment);

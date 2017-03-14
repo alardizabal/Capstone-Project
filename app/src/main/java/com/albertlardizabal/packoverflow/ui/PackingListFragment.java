@@ -90,7 +90,7 @@ public class PackingListFragment extends Fragment {
                 PackingList packingList = dataSnapshot.getValue(PackingList.class);
                 packingLists.add(packingList);
 
-                if (packingList.isActive() == true) {
+                if (packingList.isActive()) {
                     currentPackingList = packingList;
                     currentListItems = packingList.getItems();
                     MainActivity.toolbar.setTitle(currentPackingList.getTitle());
@@ -105,7 +105,7 @@ public class PackingListFragment extends Fragment {
                 PackingList packingList = dataSnapshot.getValue(PackingList.class);
                 for (int i = 0; i < packingLists.size(); i++) {
                     PackingList matchList = packingLists.get(i);
-                    if (matchList.getTitle() == packingList.getTitle()) {
+                    if (matchList.getTitle().equals(packingList.getTitle())) {
                         packingLists.set(i, packingList);
                     }
                 }
@@ -190,7 +190,7 @@ public class PackingListFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     for (int i = 0; i < packingLists.size(); i++) {
-                        if (packingLists.get(i).getTitle() == currentPackingList.getTitle()) {
+                        if (packingLists.get(i).getTitle().equals(currentPackingList.getTitle())) {
                             PackingList list = packingLists.get(i);
                             PackingListItem item = list.getItems().get(position);
                             item.setIsChecked(!item.getIsChecked());
