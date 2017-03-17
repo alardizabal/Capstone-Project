@@ -12,146 +12,134 @@ import com.google.gson.annotations.SerializedName;
 
 public class PackingListItem implements Parcelable {
 
-    @SerializedName("uid")
-    @Expose
-    private String uid;
-    @SerializedName("is_checked")
-    @Expose
-    private boolean isChecked;
-    @SerializedName("title")
-    @Expose
-    private String title;
-    @SerializedName("subtitle")
-    @Expose
-    private String subtitle;
-    @SerializedName("bag_type")
-    @Expose
-    private String bagType;
-    @SerializedName("quantity")
-    @Expose
-    private String quantity;
+	@SerializedName("uid")
+	@Expose
+	private String uid;
+	@SerializedName("is_checked")
+	@Expose
+	private boolean isChecked;
+	@SerializedName("title")
+	@Expose
+	private String title;
+	@SerializedName("subtitle")
+	@Expose
+	private String subtitle;
+	@SerializedName("bag_type")
+	@Expose
+	private String bagType;
+	@SerializedName("quantity")
+	@Expose
+	private String quantity;
 
-    /**
-     *
-     * @return
-     * The uid
-     */
-    public String getUid() {
-        return uid;
-    }
+	/**
+	 * @return The uid
+	 */
+	public String getUid() {
+		return uid;
+	}
 
-    /**
-     *
-     * @param uid
-     * The uid
-     */
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
+	/**
+	 * @param uid The uid
+	 */
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
 
-    /**
-     *
-     * @return
-     * The is item checked flag
-     */
-    public boolean getIsChecked() {
-        return isChecked;
-    }
+	/**
+	 * @return The is item checked flag
+	 */
+	public boolean getIsChecked() {
+		return isChecked;
+	}
 
-    /**
-     *
-     * @param isChecked
-     * The is item checked flag
-     */
-    public void setIsChecked(boolean isChecked) {
-        this.isChecked = isChecked;
-    }
+	/**
+	 * @param isChecked The is item checked flag
+	 */
+	public void setIsChecked(boolean isChecked) {
+		this.isChecked = isChecked;
+	}
 
-    /**
-     *
-     * @return
-     * The title
-     */
-    public String getTitle() {
-        return title;
-    }
+	/**
+	 * @return The title
+	 */
+	public String getTitle() {
+		return title;
+	}
 
-    /**
-     *
-     * @param title
-     * The title
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	/**
+	 * @param title The title
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    /**
-     *
-     * @return
-     * The subtitle
-     */
-    public String getSubtitle() { return subtitle; }
+	/**
+	 * @return The subtitle
+	 */
+	public String getSubtitle() {
+		return subtitle;
+	}
 
-    /**
-     *
-     * @param subtitle
-     * The subtitle
-     */
-    public void setSubtitle(String subtitle) { this.subtitle = subtitle; }
+	/**
+	 * @param subtitle The subtitle
+	 */
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
+	}
 
-    /**
-     *
-     * @return
-     * The bagType
-     */
-    public String getBagType() { return bagType; }
+	/**
+	 * @return The bagType
+	 */
+	public String getBagType() {
+		return bagType;
+	}
 
-    /**
-     *
-     * @param bagType
-     * The bagType
-     */
-    public void setBagType(String bagType) { this.bagType = bagType; }
+	/**
+	 * @param bagType The bagType
+	 */
+	public void setBagType(String bagType) {
+		this.bagType = bagType;
+	}
 
-    /**
-     *
-     * @return
-     * The quantity
-     */
-    public String getQuantity() {
-        return quantity;
-    }
+	/**
+	 * @return The quantity
+	 */
+	public String getQuantity() {
+		return quantity;
+	}
 
-    /**
-     *
-     * @param quantity
-     * The quantity
-     */
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
-    }
+	/**
+	 * @param quantity The quantity
+	 */
+	public void setQuantity(String quantity) {
+		this.quantity = quantity;
+	}
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(uid);
-        dest.writeByte((byte) (isChecked ? 1 : 0));
-        dest.writeString(title);
-        dest.writeString(subtitle);
-        dest.writeString(bagType);
-        dest.writeString(quantity);
-    }
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(uid);
+		dest.writeByte((byte) (isChecked ? 1 : 0));
+		dest.writeString(title);
+		dest.writeString(subtitle);
+		dest.writeString(bagType);
+		dest.writeString(quantity);
+	}
 
-    public static final Parcelable.Creator<PackingListItem> CREATOR = new Parcelable.Creator<PackingListItem>() {
+	public static final Parcelable.Creator<PackingListItem> CREATOR = new Parcelable.Creator<PackingListItem>() {
 
-        @Override
-        public PackingListItem createFromParcel(Parcel source) { return null; }
+		@Override
+		public PackingListItem createFromParcel(Parcel source) {
+			return null;
+		}
 
-        @Override
-        public PackingListItem[] newArray(int size) { return new PackingListItem[size]; }
-    };
+		@Override
+		public PackingListItem[] newArray(int size) {
+			return new PackingListItem[size];
+		}
+	};
 }

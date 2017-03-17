@@ -29,173 +29,177 @@ import java.util.ArrayList;
 
 public class TemplateListsFragment extends Fragment {
 
-    private static final String LOG_TAG = TemplateListsFragment.class.getSimpleName();
+	private static final String LOG_TAG = TemplateListsFragment.class.getSimpleName();
 
-    private ListTemplateDbHelper dbHelper;
+	private ListTemplateDbHelper dbHelper;
 
-    private ArrayList<PackingList> lists = new ArrayList<>();
+	private ArrayList<PackingList> lists = new ArrayList<>();
 
-    private TemplateListsAdapter adapter;
+	private TemplateListsAdapter adapter;
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Nullable
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_template_lists, container, false);
-        view.setBackgroundColor(Color.WHITE);
+		View view = inflater.inflate(R.layout.fragment_template_lists, container, false);
+		view.setBackgroundColor(Color.WHITE);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.template_lists_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+		RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.template_lists_recycler_view);
+		recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        adapter = new TemplateListsAdapter(lists);
-        recyclerView.setAdapter(adapter);
+		adapter = new TemplateListsAdapter(lists);
+		recyclerView.setAdapter(adapter);
 
-        new ReadDatabaseTask().execute();
+		new ReadDatabaseTask().execute();
 
-        return view;
-    }
+		return view;
+	}
 
-    @Override
-    public void onDestroy() {
-        dbHelper.close();
-        super.onDestroy();
-    }
+	@Override
+	public void onDestroy() {
+		dbHelper.close();
+		super.onDestroy();
+	}
 
-    private class ReadDatabaseTask extends AsyncTask<Void, Void, Cursor> {
+	private class ReadDatabaseTask extends AsyncTask<Void, Void, Cursor> {
 
-        @Override
-        protected Cursor doInBackground(Void... params) {
-            dbHelper = new ListTemplateDbHelper(getContext());
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
+		@Override
+		protected Cursor doInBackground(Void... params) {
+			dbHelper = new ListTemplateDbHelper(getContext());
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-            String[] projection = {
-                    ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE,
-                    ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE,
-            };
+			String[] projection = {
+					ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE,
+					ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE,
+			};
 
-            Cursor cursor = db.query(
-                    ListTemplateContract.ListTemplateEntry.TABLE_NAME,      // Table to query
-                    projection,                                             // Columns to return
-                    null,                                                   // Columns for WHERE clause
-                    null,                                                   // Values for WHERE clause
-                    null,                                                   // Don't group rows
-                    null,                                                   // Don't filter by row groups
-                    null                                                    // The sort order
-            );
+			Cursor cursor = db.query(
+					ListTemplateContract.ListTemplateEntry.TABLE_NAME,      // Table to query
+					projection,                                             // Columns to return
+					null,                                                   // Columns for WHERE clause
+					null,                                                   // Values for WHERE clause
+					null,                                                   // Don't group rows
+					null,                                                   // Don't filter by row groups
+					null                                                    // The sort order
+			);
 
-            ArrayList<PackingList> packingLists = new ArrayList<>();
-            while (cursor.moveToNext()) {
-                String packingListTitle = cursor.getString(
-                        cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE));
-                String packingListItemTitle = cursor.getString(
-                        cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE));
+			ArrayList<PackingList> packingLists = new ArrayList<>();
+			while (cursor.moveToNext()) {
+				String packingListTitle = cursor.getString(
+						cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE));
+				String packingListItemTitle = cursor.getString(
+						cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE));
 
-                PackingListItem packingListItem = new PackingListItem();
-                packingListItem.setTitle(packingListItemTitle);
+				PackingListItem packingListItem = new PackingListItem();
+				packingListItem.setTitle(packingListItemTitle);
 
-                ArrayList<PackingListItem> items = new ArrayList<>();
-                items.add(packingListItem);
+				ArrayList<PackingListItem> items = new ArrayList<>();
+				items.add(packingListItem);
 
-                PackingList packingList = new PackingList();
-                packingList.setTitle(packingListTitle);
-                packingList.setItems(items);
-                packingLists.add(packingList);
-            }
-            lists = packingLists;
-            cursor.close();
-            return cursor;
-        }
+				PackingList packingList = new PackingList();
+				packingList.setTitle(packingListTitle);
+				packingList.setItems(items);
+				packingLists.add(packingList);
+			}
+			lists = packingLists;
+			cursor.close();
+			return cursor;
+		}
 
-        @Override
-        protected void onPostExecute(Cursor cursor) {
-            if (lists.size() == 0) {
-                new WriteDatabaseTask().execute();
-            } else {
-                adapter.notifyDataSetChanged();
-            }
-        }
-    }
+		@Override
+		protected void onPostExecute(Cursor cursor) {
+			if (lists.size() == 0) {
+				new WriteDatabaseTask().execute();
+			} else {
+				adapter.notifyDataSetChanged();
+			}
+		}
+	}
 
-    private class WriteDatabaseTask extends AsyncTask<Void, Void, Cursor> {
+	private class WriteDatabaseTask extends AsyncTask<Void, Void, Cursor> {
 
-        @Override
-        protected Cursor doInBackground(Void... params) {
-            // Gets the data repository in write mode
-            dbHelper = new ListTemplateDbHelper(getContext());
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
+		@Override
+		protected Cursor doInBackground(Void... params) {
+			// Gets the data repository in write mode
+			dbHelper = new ListTemplateDbHelper(getContext());
+			SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-            // Create a new map of values, where column names are the keys
-            ContentValues values = new ContentValues();
-            values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Scuba Diving Expedition");
-            values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
+			// Create a new map of values, where column names are the keys
+			ContentValues values = new ContentValues();
+			values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Scuba Diving Expedition");
+			values.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
 
-            ContentValues values2 = new ContentValues();
-            values2.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Annual Ski Trip");
-            values2.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Skis");
+			ContentValues values2 = new ContentValues();
+			values2.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Annual Ski Trip");
+			values2.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Skis");
 
-            ContentValues values3 = new ContentValues();
-            values3.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Indoor Rock Climbing");
-            values3.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Harness");
+			ContentValues values3 = new ContentValues();
+			values3.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Indoor Rock Climbing");
+			values3.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Harness");
 
-            ContentValues values4 = new ContentValues();
-            values4.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Skydiving");
-            values4.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Parachute");
+			ContentValues values4 = new ContentValues();
+			values4.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE, "Skydiving");
+			values4.put(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE, "Parachute");
 
-            // Insert the new row, returning the primary key value of the new row
-            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
-            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values2);
-            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values3);
-            db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values4);
-            return null;
-        }
+			// Insert the new row, returning the primary key value of the new row
+			db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values);
+			db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values2);
+			db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values3);
+			db.insert(ListTemplateContract.ListTemplateEntry.TABLE_NAME, null, values4);
+			return null;
+		}
 
-        @Override
-        protected void onPostExecute(Cursor cursor) {
-            new ReadDatabaseTask().execute();
-        }
-    }
+		@Override
+		protected void onPostExecute(Cursor cursor) {
+			new ReadDatabaseTask().execute();
+		}
+	}
 
-    public class TemplateListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+	public class TemplateListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private PackingList listItem;
+		private PackingList listItem;
 
-        private TextView title;
+		private TextView title;
 
-        public TemplateListsHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.template_list_item, parent, false));
+		public TemplateListsHolder(LayoutInflater inflater, ViewGroup parent) {
+			super(inflater.inflate(R.layout.template_list_item, parent, false));
 
-            title = (TextView) itemView.findViewById(R.id.template_list_item_title);
+			title = (TextView) itemView.findViewById(R.id.template_list_item_title);
 
-            itemView.setOnClickListener(this);
-        }
+			itemView.setOnClickListener(this);
+		}
 
-        public void bind(PackingList packingList) {
-            listItem = packingList;
-        }
+		public void bind(PackingList packingList) {
+			listItem = packingList;
+		}
 
-        @Override
-        public void onClick(View v) {
+		@Override
+		public void onClick(View v) {
 
-        }
-    }
+		}
+	}
 
-    public class TemplateListsAdapter extends RecyclerView.Adapter<TemplateListsHolder> {
+	public class TemplateListsAdapter extends RecyclerView.Adapter<TemplateListsHolder> {
 
-        public TemplateListsAdapter(ArrayList<PackingList> listItems) { lists = listItems; }
+		public TemplateListsAdapter(ArrayList<PackingList> listItems) {
+			lists = listItems;
+		}
 
-        @Override
-        public TemplateListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new TemplateListsHolder(layoutInflater, parent);
-        }
+		@Override
+		public TemplateListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+			return new TemplateListsHolder(layoutInflater, parent);
+		}
 
-        @Override
-        public void onBindViewHolder(TemplateListsHolder holder, int position) {
-            PackingList listItem = lists.get(position);
-            holder.title.setText(listItem.getTitle());
-        }
+		@Override
+		public void onBindViewHolder(TemplateListsHolder holder, int position) {
+			PackingList listItem = lists.get(position);
+			holder.title.setText(listItem.getTitle());
+		}
 
-        @Override
-        public int getItemCount() { return lists.size(); }
-    }
+		@Override
+		public int getItemCount() {
+			return lists.size();
+		}
+	}
 }

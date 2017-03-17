@@ -22,59 +22,59 @@ import java.util.ArrayList;
 
 public class EditListDialogFragment extends DialogFragment {
 
-    private static final String LOG_TAG = EditListDialogFragment.class.getSimpleName();
+	private static final String LOG_TAG = EditListDialogFragment.class.getSimpleName();
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+	@NonNull
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        final EditText title;
+		final EditText title;
 
-        final PackingList list;
+		final PackingList list;
 
-        if (getArguments() != null) {
-            list = getArguments().getParcelable("packingList");
-        } else {
-            list = null;
-        }
+		if (getArguments() != null) {
+			list = getArguments().getParcelable("packingList");
+		} else {
+			list = null;
+		}
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v = inflater.inflate(R.layout.fragment_edit_list_dialog, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		LayoutInflater inflater = getActivity().getLayoutInflater();
+		View v = inflater.inflate(R.layout.fragment_edit_list_dialog, null);
 
-        title = (EditText) v.findViewById(R.id.dialog_list_title);
+		title = (EditText) v.findViewById(R.id.dialog_list_title);
 
-        if (list != null) {
-            title.setText(list.getTitle());
-        }
+		if (list != null) {
+			title.setText(list.getTitle());
+		}
 
-        builder.setView(v)
-                .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        ArrayList<PackingList> lists = PackingListFragment.packingLists;
-                        if (list == null) {
-                            PackingList newList = new PackingList();
-                            if (title.getText().length() > 0) {
-                                newList.setTitle(title.getText().toString());
-                            }
-                            lists.add(newList);
-                        } else {
-                            for (int i = 0; i < lists.size(); i++) {
-                                PackingList tempList = lists.get(i);
-                                if (tempList.getTitle().equals(list.getTitle())) {
-                                    tempList.setTitle(title.getText().toString());
-                                }
-                            }
-                        }
-                        PackingListFragment.updateFirebase();
-                    }
-                })
-                .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        EditListDialogFragment.this.getDialog().cancel();
-                    }
-                });
-        return builder.create();
-    }
+		builder.setView(v)
+				.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						ArrayList<PackingList> lists = PackingListFragment.packingLists;
+						if (list == null) {
+							PackingList newList = new PackingList();
+							if (title.getText().length() > 0) {
+								newList.setTitle(title.getText().toString());
+							}
+							lists.add(newList);
+						} else {
+							for (int i = 0; i < lists.size(); i++) {
+								PackingList tempList = lists.get(i);
+								if (tempList.getTitle().equals(list.getTitle())) {
+									tempList.setTitle(title.getText().toString());
+								}
+							}
+						}
+						PackingListFragment.updateFirebase();
+					}
+				})
+				.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						EditListDialogFragment.this.getDialog().cancel();
+					}
+				});
+		return builder.create();
+	}
 }

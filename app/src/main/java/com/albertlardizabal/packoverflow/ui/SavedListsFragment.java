@@ -1,5 +1,6 @@
 package com.albertlardizabal.packoverflow.ui;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -29,136 +30,153 @@ import java.util.ArrayList;
 
 public class SavedListsFragment extends Fragment {
 
-    private static final String LOG_TAG = SavedListsFragment.class.getSimpleName();
+	private static final String LOG_TAG = SavedListsFragment.class.getSimpleName();
 
-    public static SavedListsAdapter adapter;
+	public interface OnPackingListSelectedListener {
+		public void onPackingListSelected(PackingList packingList);
+	}
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	private OnPackingListSelectedListener listener;
+	public static SavedListsAdapter adapter;
 
-        View view = inflater.inflate(R.layout.fragment_saved_lists, container, false);
-        view.setBackgroundColor(Color.WHITE);
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		try {
+			listener = (OnPackingListSelectedListener) getActivity();
+		} catch (ClassCastException e) {
+			throw new ClassCastException(getActivity().toString() + " must implement OnPackingListSelectedListener");
+		}
+	}
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.saved_lists_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+	@Nullable
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        adapter = new SavedListsAdapter(PackingListFragment.packingLists);
-        recyclerView.setAdapter(adapter);
+		View view = inflater.inflate(R.layout.fragment_saved_lists, container, false);
+		view.setBackgroundColor(Color.WHITE);
 
-        return view;
-    }
+		RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.saved_lists_recycler_view);
+		recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-    private class SavedListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+		adapter = new SavedListsAdapter(PackingListFragment.packingLists);
+		recyclerView.setAdapter(adapter);
 
-        private PackingList listItem;
+		return view;
+	}
 
-        private CheckBox checkBox;
-        private TextView title;
+	private class SavedListsHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private SavedListsHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.saved_list_item, parent, false));
+		private PackingList listItem;
 
-            checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
-            title = (TextView) itemView.findViewById(R.id.saved_list_item_title);
+		private CheckBox checkBox;
+		private TextView title;
 
-            itemView.setOnClickListener(this);
+		private SavedListsHolder(LayoutInflater inflater, ViewGroup parent) {
+			super(inflater.inflate(R.layout.saved_list_item, parent, false));
 
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Log.d(LOG_TAG, "tapped");
-                }
-            });
-        }
+			checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
+			title = (TextView) itemView.findViewById(R.id.saved_list_item_title);
 
-        public void bind(PackingList packingList) {
-            listItem = packingList;
-        }
+			itemView.setOnClickListener(this);
 
-        @Override
-        public void onClick(View v) {
+			checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					Log.d(LOG_TAG, "tapped");
+				}
+			});
+		}
 
-        }
-    }
+		public void bind(PackingList packingList) {
+			listItem = packingList;
+		}
 
-    public class SavedListsAdapter extends RecyclerView.Adapter<SavedListsHolder> {
+		@Override
+		public void onClick(View v) {
 
-        private ArrayList<PackingList> lists;
+		}
+	}
 
-        public SavedListsAdapter(ArrayList<PackingList> lists) {
-            this.lists = lists;
-        }
+	public class SavedListsAdapter extends RecyclerView.Adapter<SavedListsHolder> {
 
-        @Override
-        public SavedListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new SavedListsHolder(layoutInflater, parent);
-        }
+		private ArrayList<PackingList> lists;
 
-        @Override
-        public void onBindViewHolder(SavedListsHolder holder, final int position) {
+		public SavedListsAdapter(ArrayList<PackingList> lists) {
+			this.lists = lists;
+		}
 
-            final PackingList list = lists.get(position);
+		@Override
+		public SavedListsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+			return new SavedListsHolder(layoutInflater, parent);
+		}
 
-            holder.title.setText(list.getTitle());
+		@Override
+		public void onBindViewHolder(SavedListsHolder holder, final int position) {
 
-            holder.checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+			final PackingList list = lists.get(position);
 
-                    for (int i = 0; i < lists.size(); i++) {
-                        if (lists.get(i).getTitle().equals(list.getTitle())) {
-                            list.setIsChecked(!list.getIsChecked());
-                            return;
-                        }
-                    }
-                }
-            });
+			holder.title.setText(list.getTitle());
 
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+			holder.checkBox.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
 
-                @Override
-                public boolean onLongClick(View v) {
-                    Bundle itemBundle = new Bundle();
-                    itemBundle.putParcelable("packingList", list);
-                    DialogFragment dialogFragment = new EditListDialogFragment();
-                    dialogFragment.setArguments(itemBundle);
-                    dialogFragment.show(getFragmentManager(), "editList");
-                    Log.d(LOG_TAG, "Long press");
-                    return false;
-                }
-            });
+					for (int i = 0; i < lists.size(); i++) {
+						if (lists.get(i).getTitle().equals(list.getTitle())) {
+							list.setIsChecked(!list.getIsChecked());
+							return;
+						}
+					}
+				}
+			});
 
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
+			holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
 
-                @Override
-                public void onClick(View v) {
+				@Override
+				public boolean onLongClick(View v) {
+					Bundle itemBundle = new Bundle();
+					itemBundle.putParcelable("packingList", list);
+					DialogFragment dialogFragment = new EditListDialogFragment();
+					dialogFragment.setArguments(itemBundle);
+					dialogFragment.show(getFragmentManager(), "editList");
+					Log.d(LOG_TAG, "Long press");
+					return false;
+				}
+			});
 
-                    FragmentManager fragmentManager = getFragmentManager();
-                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+			holder.itemView.setOnClickListener(new View.OnClickListener() {
 
-                    PackingListFragment fragment = new PackingListFragment();
-                    PackingListFragment.currentPackingList = list;
-                    PackingListFragment.currentListItems = list.getItems();
-                    PackingListFragment.adapter.notifyDataSetChanged();
+				@Override
+				public void onClick(View v) {
 
-                    transaction.replace(R.id.content_main, fragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-            });
-        }
+					FragmentManager fragmentManager = getFragmentManager();
+					FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        @Override
-        public int getItemCount() { return lists.size(); }
-    }
+					PackingListFragment fragment = new PackingListFragment();
+					PackingListFragment.currentPackingList = list;
+					PackingListFragment.currentListItems = list.getItems();
+					PackingListFragment.adapter.notifyDataSetChanged();
 
-    private void navigateToPackingListFragment() {
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+					transaction.replace(R.id.content_main, fragment);
+					transaction.addToBackStack(null);
+					transaction.commit();
+				}
+			});
+		}
 
-        Fragment fragment = new PackingListFragment();
+		@Override
+		public int getItemCount() {
+			return lists.size();
+		}
+	}
+
+	private void navigateToPackingListFragment() {
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+		Fragment fragment = new PackingListFragment();
 //        fab.setVisibility(View.VISIBLE);
 //        CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
 //        showMenuItems();
@@ -166,9 +184,9 @@ public class SavedListsFragment extends Fragment {
 //        renameListMenuItem.setVisible(true);
 //        deleteListMenuItem.setVisible(true);
 
-        transaction.replace(R.id.content_main, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
+		transaction.replace(R.id.content_main, fragment);
+		transaction.addToBackStack(null);
+		transaction.commit();
+	}
 
 }

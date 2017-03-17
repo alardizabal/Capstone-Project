@@ -8,11 +8,12 @@ import android.provider.BaseColumns;
 
 public final class ListTemplateContract {
 
-    private ListTemplateContract() {}
+	private ListTemplateContract() {
+	}
 
-    public static class ListTemplateEntry implements BaseColumns {
-        public static final String TABLE_NAME = "template";
-        public static final String COLUMN_NAME_TITLE = "title";
-        public static final String COLUMN_NAME_ITEM_TITLE = "item_title";
-    }
+	public static class ListTemplateEntry implements BaseColumns {
+		public static final String TABLE_NAME = "template";
+		public static final String COLUMN_NAME_TITLE = "title";
+		public static final String COLUMN_NAME_ITEM_TITLE = "item_title";
+	}
 }

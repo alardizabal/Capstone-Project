@@ -18,36 +18,36 @@ import com.albertlardizabal.packoverflow.ui.PackingListFragment;
 
 public class WidgetProvider extends AppWidgetProvider {
 
-    private static final String LOG_TAG = WidgetProvider.class.getSimpleName();
+	private static final String LOG_TAG = WidgetProvider.class.getSimpleName();
 
-    @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        for (int widgetId : appWidgetIds) {
+	@Override
+	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+		for (int widgetId : appWidgetIds) {
 
-            Intent intent = new Intent(context, PackingListFragment.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-            RemoteViews views = new RemoteViews(context.getPackageName(),
-                    R.layout.widget_listview);
-            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
-            setRemoteAdapter(context, views);
-            // TODO - Set empty state view
+			Intent intent = new Intent(context, PackingListFragment.class);
+			PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+			RemoteViews views = new RemoteViews(context.getPackageName(),
+					R.layout.widget_listview);
+			views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+			setRemoteAdapter(context, views);
+			// TODO - Set empty state view
 
-            Intent clickIntent = new Intent(context, PackingListFragment.class);
-            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
-                    .addNextIntentWithParentStack(clickIntent)
-                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
-            appWidgetManager.updateAppWidget(widgetId, views);
-        }
-    }
+			Intent clickIntent = new Intent(context, PackingListFragment.class);
+			PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
+					.addNextIntentWithParentStack(clickIntent)
+					.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+			views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
+			appWidgetManager.updateAppWidget(widgetId, views);
+		}
+	}
 
-    private void setRemoteAdapter(Context context, final RemoteViews views) {
-        try {
-            views.setRemoteAdapter(R.id.widget_list,
-                    new Intent(context, WidgetRemoteViewsService.class));
-        } catch(Exception e) {
-            Log.e(LOG_TAG, e.getMessage());
-            e.printStackTrace();
-        }
-    }
+	private void setRemoteAdapter(Context context, final RemoteViews views) {
+		try {
+			views.setRemoteAdapter(R.id.widget_list,
+					new Intent(context, WidgetRemoteViewsService.class));
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage());
+			e.printStackTrace();
+		}
+	}
 }

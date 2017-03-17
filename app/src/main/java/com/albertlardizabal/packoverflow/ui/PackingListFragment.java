@@ -33,89 +33,89 @@ import java.util.ArrayList;
 
 public class PackingListFragment extends Fragment {
 
-    private static final String LOG_TAG = PackingListFragment.class.getSimpleName();
+	private static final String LOG_TAG = PackingListFragment.class.getSimpleName();
 
-    public static PackingListAdapter adapter;
+	public static PackingListAdapter adapter;
 
-    public static ArrayList<PackingList> packingLists = new ArrayList<>();
+	public static ArrayList<PackingList> packingLists = new ArrayList<>();
 
-    public static PackingList currentPackingList = new PackingList();
-    public static ArrayList<PackingListItem> currentListItems = new ArrayList<>();
+	public static PackingList currentPackingList = new PackingList();
+	public static ArrayList<PackingListItem> currentListItems = new ArrayList<>();
 
-    private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private static final DatabaseReference rootReference = firebaseDatabase.getReference();
-    public static final DatabaseReference savedListsReference = rootReference.child("saved_lists");
+	private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+	private static final DatabaseReference rootReference = firebaseDatabase.getReference();
+	public static final DatabaseReference savedListsReference = rootReference.child("saved_lists");
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Nullable
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_packing_list, container, false);
-        view.setBackgroundColor(Color.WHITE);
+		View view = inflater.inflate(R.layout.fragment_packing_list, container, false);
+		view.setBackgroundColor(Color.WHITE);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.packing_list_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+		RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.packing_list_recycler_view);
+		recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        adapter = new PackingListAdapter(currentListItems);
-        recyclerView.setAdapter(adapter);
+		adapter = new PackingListAdapter(currentListItems);
+		recyclerView.setAdapter(adapter);
 
-        return view;
-    }
+		return view;
+	}
 
-    public static void updateFirebase() {
-        for (PackingList list : packingLists) {
-            savedListsReference.child(list.getTitle()).setValue(list);
-        }
-    }
+	public static void updateFirebase() {
+		for (PackingList list : packingLists) {
+			savedListsReference.child(list.getTitle()).setValue(list);
+		}
+	}
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        packingLists.clear();
+	@Override
+	public void onStart() {
+		super.onStart();
+		packingLists.clear();
 
-        savedListsReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(LOG_TAG, "onDataChanged");
-            }
+		savedListsReference.addValueEventListener(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				Log.d(LOG_TAG, "onDataChanged");
+			}
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(LOG_TAG, "onCancelled");
-            }
-        });
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+				Log.d(LOG_TAG, "onCancelled");
+			}
+		});
 
-        savedListsReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                PackingList packingList = dataSnapshot.getValue(PackingList.class);
-                packingLists.add(packingList);
+		savedListsReference.addChildEventListener(new ChildEventListener() {
+			@Override
+			public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+				PackingList packingList = dataSnapshot.getValue(PackingList.class);
+				packingLists.add(packingList);
 
-                if (packingList.isActive()) {
-                    currentPackingList = packingList;
-                    currentListItems = packingList.getItems();
-                    MainActivity.toolbar.setTitle(currentPackingList.getTitle());
-                }
-                adapter.notifyDataSetChanged();
+				if (packingList.isActive()) {
+					currentPackingList = packingList;
+					currentListItems = packingList.getItems();
+					MainActivity.toolbar.setTitle(currentPackingList.getTitle());
+				}
+				adapter.notifyDataSetChanged();
 
-                Log.d(LOG_TAG, "onChildAdded");
-            }
+				Log.d(LOG_TAG, "onChildAdded");
+			}
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                PackingList packingList = dataSnapshot.getValue(PackingList.class);
-                for (int i = 0; i < packingLists.size(); i++) {
-                    PackingList matchList = packingLists.get(i);
-                    if (matchList.getTitle().equals(packingList.getTitle())) {
-                        packingLists.set(i, packingList);
-                    }
-                }
-                adapter.notifyDataSetChanged();
-                Log.d(LOG_TAG, "onChildChanged");
-            }
+			@Override
+			public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+				PackingList packingList = dataSnapshot.getValue(PackingList.class);
+				for (int i = 0; i < packingLists.size(); i++) {
+					PackingList matchList = packingLists.get(i);
+					if (matchList.getTitle().equals(packingList.getTitle())) {
+						packingLists.set(i, packingList);
+					}
+				}
+				adapter.notifyDataSetChanged();
+				Log.d(LOG_TAG, "onChildChanged");
+			}
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+			@Override
+			public void onChildRemoved(DataSnapshot dataSnapshot) {
 //                PackingList removedList = dataSnapshot.getValue(PackingList.class);
 //                for (int i = 0; i < packingLists.size(); i++) {
 //                    PackingList list = packingLists.get(i);
@@ -123,99 +123,101 @@ public class PackingListFragment extends Fragment {
 //
 //                    }
 //                }
-                adapter.notifyDataSetChanged();
-                SavedListsFragment.adapter.notifyDataSetChanged();
-                Log.d(LOG_TAG, "onChildRemoved");
-            }
+				adapter.notifyDataSetChanged();
+				SavedListsFragment.adapter.notifyDataSetChanged();
+				Log.d(LOG_TAG, "onChildRemoved");
+			}
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                adapter.notifyDataSetChanged();
-                Log.d(LOG_TAG, "onChildMoved");
-            }
+			@Override
+			public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+				adapter.notifyDataSetChanged();
+				Log.d(LOG_TAG, "onChildMoved");
+			}
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(LOG_TAG, "onCancelled");
-            }
-        });
-    }
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+				Log.d(LOG_TAG, "onCancelled");
+			}
+		});
+	}
 
-    public class PackingListHolder extends RecyclerView.ViewHolder {
+	public class PackingListHolder extends RecyclerView.ViewHolder {
 
-        private PackingListItem listItem;
+		private PackingListItem listItem;
 
-        private CheckBox checkBox;
-        private TextView title;
-        private TextView subtitle;
-        private TextView quantity;
+		private CheckBox checkBox;
+		private TextView title;
+		private TextView subtitle;
+		private TextView quantity;
 
-        public PackingListHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.packing_list_item, parent, false));
+		public PackingListHolder(LayoutInflater inflater, ViewGroup parent) {
+			super(inflater.inflate(R.layout.packing_list_item, parent, false));
 
-            checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
-            title = (TextView) itemView.findViewById(R.id.list_item_title);
-            subtitle = (TextView) itemView.findViewById(R.id.list_item_subtitle);
-            quantity = (TextView) itemView.findViewById(R.id.list_item_quantity);
-        }
+			checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
+			title = (TextView) itemView.findViewById(R.id.list_item_title);
+			subtitle = (TextView) itemView.findViewById(R.id.list_item_subtitle);
+			quantity = (TextView) itemView.findViewById(R.id.list_item_quantity);
+		}
 
-        public void bind(PackingListItem packingListItem) {
-            listItem = packingListItem;
-        }
-    }
+		public void bind(PackingListItem packingListItem) {
+			listItem = packingListItem;
+		}
+	}
 
-    public class PackingListAdapter extends RecyclerView.Adapter<PackingListHolder> {
+	public class PackingListAdapter extends RecyclerView.Adapter<PackingListHolder> {
 
-        public PackingListAdapter(ArrayList<PackingListItem> listItems) {
-            PackingListFragment.currentListItems = listItems;
-        }
+		public PackingListAdapter(ArrayList<PackingListItem> listItems) {
+			PackingListFragment.currentListItems = listItems;
+		}
 
-        @Override
-        public PackingListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new PackingListHolder(layoutInflater, parent);
-        }
+		@Override
+		public PackingListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+			LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+			return new PackingListHolder(layoutInflater, parent);
+		}
 
-        @Override
-        public void onBindViewHolder(PackingListHolder holder, final int position) {
+		@Override
+		public void onBindViewHolder(PackingListHolder holder, final int position) {
 
-            final PackingListItem listItem = PackingListFragment.currentListItems.get(position);
+			final PackingListItem listItem = PackingListFragment.currentListItems.get(position);
 
-            holder.title.setText(listItem.getTitle());
-            holder.subtitle.setText(listItem.getSubtitle());
-            holder.quantity.setText("x" + listItem.getQuantity());
-            System.out.println("Checked " + position + " " + listItem.getIsChecked());
-            holder.checkBox.setChecked(listItem.getIsChecked());
+			holder.title.setText(listItem.getTitle());
+			holder.subtitle.setText(listItem.getSubtitle());
+			holder.quantity.setText("x" + listItem.getQuantity());
+			System.out.println("Checked " + position + " " + listItem.getIsChecked());
+			holder.checkBox.setChecked(listItem.getIsChecked());
 
-            holder.checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    for (int i = 0; i < packingLists.size(); i++) {
-                        if (packingLists.get(i).getTitle().equals(currentPackingList.getTitle())) {
-                            PackingList list = packingLists.get(i);
-                            PackingListItem item = list.getItems().get(position);
-                            item.setIsChecked(!item.getIsChecked());
+			holder.checkBox.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					for (int i = 0; i < packingLists.size(); i++) {
+						if (packingLists.get(i).getTitle().equals(currentPackingList.getTitle())) {
+							PackingList list = packingLists.get(i);
+							PackingListItem item = list.getItems().get(position);
+							item.setIsChecked(!item.getIsChecked());
 //                            updateFirebase();
-                            return;
-                        }
-                    }
-                }
-            });
+							return;
+						}
+					}
+				}
+			});
 
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
+			holder.itemView.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    Bundle itemBundle = new Bundle();
-                    itemBundle.putParcelable("listItem", listItem);
-                    DialogFragment dialogFragment = new EditItemDialogFragment();
-                    dialogFragment.setArguments(itemBundle);
-                    dialogFragment.show(getFragmentManager(), "editListItem");
-                }
-            });
-        }
+				@Override
+				public void onClick(View v) {
+					Bundle itemBundle = new Bundle();
+					itemBundle.putParcelable("listItem", listItem);
+					DialogFragment dialogFragment = new EditItemDialogFragment();
+					dialogFragment.setArguments(itemBundle);
+					dialogFragment.show(getFragmentManager(), "editListItem");
+				}
+			});
+		}
 
-        @Override
-        public int getItemCount() { return PackingListFragment.currentListItems.size(); }
-    }
+		@Override
+		public int getItemCount() {
+			return PackingListFragment.currentListItems.size();
+		}
+	}
 }

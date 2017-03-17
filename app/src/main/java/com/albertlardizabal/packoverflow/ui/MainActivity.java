@@ -30,282 +30,289 @@ import java.util.ArrayList;
 import static com.albertlardizabal.packoverflow.ui.PackingListFragment.currentPackingList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+		implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+	private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private FirebaseAnalytics firebaseAnalytics;
+	private FirebaseAnalytics firebaseAnalytics;
 
-    public static Toolbar toolbar;
-    private FloatingActionButton fab;
+	public static Toolbar toolbar;
+	private FloatingActionButton fab;
 
-    private MenuItem calendarMenuItem;
-    private MenuItem shareMenuItem;
-    private MenuItem newListMenuItem;
-    private MenuItem renameListMenuItem;
-    private MenuItem deleteSelectedMenuItem;
-    private MenuItem deleteListMenuItem;
+	public static NavigationView navigationView;
 
-    private static final int RC_SIGN_IN = 123;
+	private MenuItem calendarMenuItem;
+	private MenuItem shareMenuItem;
+	private MenuItem newListMenuItem;
+	private MenuItem renameListMenuItem;
+	private MenuItem deleteSelectedMenuItem;
+	private MenuItem deleteListMenuItem;
 
-    public static final int PACKING_LIST_FRAGMENT = 1000;
-    public static final int SAVED_LISTS_FRAGMENT = 1001;
-    public static final int TEMPLATE_LISTS_FRAGMENT = 1002;
+	private MenuItem currentListNavigationItem;
+	private MenuItem savedListsNavigationItem;
+	private MenuItem templateListsNavigationItem;
 
-    public static int CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
+	private static final int RC_SIGN_IN = 123;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	public static final int PACKING_LIST_FRAGMENT = 1000;
+	public static final int SAVED_LISTS_FRAGMENT = 1001;
+	public static final int TEMPLATE_LISTS_FRAGMENT = 1002;
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+	public static int CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
-                    DialogFragment newFragment = new EditItemDialogFragment();
-                    newFragment.show(getSupportFragmentManager(), "editListItem");
-                } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
-                    makeNewList();
-                }
-            }
-        });
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-        // Set up Firebase
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+		toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 
-        // Set up navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+		fab = (FloatingActionButton) findViewById(R.id.fab);
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
+					DialogFragment newFragment = new EditItemDialogFragment();
+					newFragment.show(getSupportFragmentManager(), "editListItem");
+				} else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
+					makeNewList();
+				}
+			}
+		});
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+		// Set up Firebase
+		firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        // TODO - Stage data
-        ArrayList<PackingList> savedLists = Utils.stageData();
-        for (PackingList list : savedLists) {
-            PackingListFragment.savedListsReference.child(list.getTitle()).setValue(list);
-        }
-    }
+		// Set up navigation drawer
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+				this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+		drawer.addDrawerListener(toggle);
+		toggle.syncState();
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+		navigationView = (NavigationView) findViewById(R.id.nav_view);
+		navigationView.setNavigationItemSelectedListener(this);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+		// TODO - Stage data
+		ArrayList<PackingList> savedLists = Utils.stageData();
+		for (PackingList list : savedLists) {
+			PackingListFragment.savedListsReference.child(list.getTitle()).setValue(list);
+		}
+	}
 
-        calendarMenuItem = menu.findItem(R.id.action_calendar);
-        shareMenuItem = menu.findItem(R.id.action_share);
+	@Override
+	public void onBackPressed() {
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		if (drawer.isDrawerOpen(GravityCompat.START)) {
+			drawer.closeDrawer(GravityCompat.START);
+		} else {
+			super.onBackPressed();
+		}
+	}
 
-        newListMenuItem = menu.findItem(R.id.action_new_list);
-        renameListMenuItem = menu.findItem(R.id.action_rename_list);
-        deleteSelectedMenuItem = menu.findItem(R.id.action_delete_selected);
-        deleteListMenuItem = menu.findItem(R.id.action_delete_list);
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
-            configureViewForPackingListFragment();
-        } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
-            configureViewForSavedListsFragment();
-        } else if (CURRENT_FRAGMENT == TEMPLATE_LISTS_FRAGMENT) {
-            configureViewForTemplateListsFragment();
-        }
-        return true;
-    }
+		calendarMenuItem = menu.findItem(R.id.action_calendar);
+		shareMenuItem = menu.findItem(R.id.action_share);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+		newListMenuItem = menu.findItem(R.id.action_new_list);
+		renameListMenuItem = menu.findItem(R.id.action_rename_list);
+		deleteSelectedMenuItem = menu.findItem(R.id.action_delete_selected);
+		deleteListMenuItem = menu.findItem(R.id.action_delete_list);
 
-        int id = item.getItemId();
+		if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
+			configureViewForPackingListFragment();
+		} else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
+			configureViewForSavedListsFragment();
+		} else if (CURRENT_FRAGMENT == TEMPLATE_LISTS_FRAGMENT) {
+			configureViewForTemplateListsFragment();
+		}
+		return true;
+	}
 
-        if (id == R.id.action_calendar) {
-            return true;
-        } else if (id == R.id.action_share) {
-            setShareIntent();
-            return true;
-        } else if (id == R.id.action_new_list) {
-            makeNewList();
-            return true;
-        } else if (id == R.id.action_rename_list) {
-            renameList();
-            return true;
-        } else if (id == R.id.action_delete_selected) {
-            deleteSelectedItems();
-            return true;
-        } else if (id == R.id.action_delete_list) {
-            deleteList();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
 
-    private void setShareIntent() {
-        ArrayList<PackingListItem> list = PackingListFragment.currentListItems;
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+		int id = item.getItemId();
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (PackingListItem item : list) {
-            stringBuilder.append(item.getTitle());
-            stringBuilder.append("\n");
-        }
-        String currentListString = stringBuilder.toString();
+		if (id == R.id.action_calendar) {
+			return true;
+		} else if (id == R.id.action_share) {
+			setShareIntent();
+			return true;
+		} else if (id == R.id.action_new_list) {
+			makeNewList();
+			return true;
+		} else if (id == R.id.action_rename_list) {
+			renameList();
+			return true;
+		} else if (id == R.id.action_delete_selected) {
+			deleteSelectedItems();
+			return true;
+		} else if (id == R.id.action_delete_list) {
+			deleteList();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-        shareIntent.putExtra(Intent.EXTRA_TEXT, currentListString);
-        shareIntent.setType("text/plain");
-        startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_list_title)));
-    }
+	private void setShareIntent() {
+		ArrayList<PackingListItem> list = PackingListFragment.currentListItems;
+		Intent shareIntent = new Intent(Intent.ACTION_SEND);
 
-    private void makeNewList() {
-        DialogFragment dialogFragment = new EditListDialogFragment();
-        dialogFragment.show(getSupportFragmentManager(), "newList");
-    }
+		StringBuilder stringBuilder = new StringBuilder();
+		for (PackingListItem item : list) {
+			stringBuilder.append(item.getTitle());
+			stringBuilder.append("\n");
+		}
+		String currentListString = stringBuilder.toString();
 
-    private void renameList() {
-        Bundle itemBundle = new Bundle();
-        itemBundle.putParcelable("packingList", currentPackingList);
-        DialogFragment dialogFragment = new EditListDialogFragment();
-        dialogFragment.setArguments(itemBundle);
-        dialogFragment.show(getSupportFragmentManager(), "editList");
-    }
+		shareIntent.putExtra(Intent.EXTRA_TEXT, currentListString);
+		shareIntent.setType("text/plain");
+		startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_list_title)));
+	}
 
-    private void deleteSelectedItems() {
-        ArrayList<PackingList> lists = PackingListFragment.packingLists;
-        if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
-            for (int i = 0; i < lists.size(); i++) {
-                PackingList list = lists.get(i);
-                if (list.getTitle().equals(currentPackingList.getTitle())) {
-                    for (int j = list.getItems().size() - 1; j >= 0; j--) {
-                        PackingListItem deleteItem = list.getItems().get(j);
-                        if (deleteItem.getIsChecked()) {
-                            list.getItems().remove(j);
-                        }
-                    }
-                    PackingListFragment.updateFirebase();
-                    return;
-                }
-            }
-        } else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
-            for (int j = lists.size() - 1; j >= 0; j--) {
-                PackingList deleteList = lists.get(j);
-                if (deleteList.getIsChecked()) {
-                    lists.remove(j);
-                }
-            }
-            PackingListFragment.updateFirebase();
-        }
-    }
+	private void makeNewList() {
+		DialogFragment dialogFragment = new EditListDialogFragment();
+		dialogFragment.show(getSupportFragmentManager(), "newList");
+	}
 
-    private void deleteList() {
-        ArrayList<PackingList> lists = PackingListFragment.packingLists;
-        for (int i = 0; i < lists.size(); i++) {
-            PackingList list = lists.get(i);
-            if (list.getTitle().equals(currentPackingList.getTitle())) {
-                for (int j = list.getItems().size() - 1; j >= 0; j--) {
-                    PackingListItem deleteItem = list.getItems().get(j);
-                    if (deleteItem.getIsChecked()) {
-                        list.getItems().remove(j);
-                    }
-                }
-                PackingListFragment.updateFirebase();
-                return;
-            }
-        }
-    }
+	private void renameList() {
+		Bundle itemBundle = new Bundle();
+		itemBundle.putParcelable("packingList", currentPackingList);
+		DialogFragment dialogFragment = new EditListDialogFragment();
+		dialogFragment.setArguments(itemBundle);
+		dialogFragment.show(getSupportFragmentManager(), "editList");
+	}
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+	private void deleteSelectedItems() {
+		ArrayList<PackingList> lists = PackingListFragment.packingLists;
+		if (CURRENT_FRAGMENT == PACKING_LIST_FRAGMENT) {
+			for (int i = 0; i < lists.size(); i++) {
+				PackingList list = lists.get(i);
+				if (list.getTitle().equals(currentPackingList.getTitle())) {
+					for (int j = list.getItems().size() - 1; j >= 0; j--) {
+						PackingListItem deleteItem = list.getItems().get(j);
+						if (deleteItem.getIsChecked()) {
+							list.getItems().remove(j);
+						}
+					}
+					PackingListFragment.updateFirebase();
+					return;
+				}
+			}
+		} else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
+			for (int j = lists.size() - 1; j >= 0; j--) {
+				PackingList deleteList = lists.get(j);
+				if (deleteList.getIsChecked()) {
+					lists.remove(j);
+				}
+			}
+			PackingListFragment.updateFirebase();
+		}
+	}
 
-        int id = item.getItemId();
+	private void deleteList() {
+		ArrayList<PackingList> lists = PackingListFragment.packingLists;
+		for (int i = 0; i < lists.size(); i++) {
+			PackingList list = lists.get(i);
+			if (list.getTitle().equals(currentPackingList.getTitle())) {
+				for (int j = list.getItems().size() - 1; j >= 0; j--) {
+					PackingListItem deleteItem = list.getItems().get(j);
+					if (deleteItem.getIsChecked()) {
+						list.getItems().remove(j);
+					}
+				}
+				PackingListFragment.updateFirebase();
+				return;
+			}
+		}
+	}
 
-        if (id == R.id.nav_current_list) {
-            navigateToFragment(PACKING_LIST_FRAGMENT);
-        } else if (id == R.id.nav_saved_lists) {
-            navigateToFragment(SAVED_LISTS_FRAGMENT);
-        } else if (id == R.id.nav_template_lists) {
-            navigateToFragment(TEMPLATE_LISTS_FRAGMENT);
-        }
-        return true;
-    }
+	@SuppressWarnings("StatementWithEmptyBody")
+	@Override
+	public boolean onNavigationItemSelected(MenuItem item) {
 
-    private void navigateToFragment(int fragmentId) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        Fragment fragment = new Fragment();
+		int id = item.getItemId();
 
-        if (fragmentId == PACKING_LIST_FRAGMENT) {
-            fragment = new PackingListFragment();
-            CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
-            configureViewForPackingListFragment();
-        } else if (fragmentId == SAVED_LISTS_FRAGMENT) {
-            fragment = new SavedListsFragment();
-            CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
-            configureViewForSavedListsFragment();
-        } else if (fragmentId == TEMPLATE_LISTS_FRAGMENT) {
-            fragment = new TemplateListsFragment();
-            CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
-            configureViewForTemplateListsFragment();
-        }
+		if (id == R.id.nav_current_list) {
+			navigateToFragment(PACKING_LIST_FRAGMENT);
+		} else if (id == R.id.nav_saved_lists) {
+			navigateToFragment(SAVED_LISTS_FRAGMENT);
+		} else if (id == R.id.nav_template_lists) {
+			navigateToFragment(TEMPLATE_LISTS_FRAGMENT);
+		}
 
-        transaction.replace(R.id.content_main, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+		return true;
+	}
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-    }
+	private void navigateToFragment(int fragmentId) {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		Fragment fragment = new Fragment();
 
-    private void configureViewForPackingListFragment() {
-        fab.setVisibility(View.VISIBLE);
-        showMenuItems();
-        newListMenuItem.setVisible(true);
-        renameListMenuItem.setVisible(true);
-        deleteListMenuItem.setVisible(true);
-        deleteSelectedMenuItem.setVisible(true);
-    }
+		if (fragmentId == PACKING_LIST_FRAGMENT) {
+			fragment = new PackingListFragment();
+			CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
+			configureViewForPackingListFragment();
+		} else if (fragmentId == SAVED_LISTS_FRAGMENT) {
+			fragment = new SavedListsFragment();
+			CURRENT_FRAGMENT = SAVED_LISTS_FRAGMENT;
+			configureViewForSavedListsFragment();
+		} else if (fragmentId == TEMPLATE_LISTS_FRAGMENT) {
+			fragment = new TemplateListsFragment();
+			CURRENT_FRAGMENT = TEMPLATE_LISTS_FRAGMENT;
+			configureViewForTemplateListsFragment();
+		}
 
-    private void configureViewForSavedListsFragment() {
-        toolbar.setTitle(R.string.saved_lists);
-        fab.setVisibility(View.VISIBLE);
-        hideMenuItems();
-        newListMenuItem.setVisible(false);
-        renameListMenuItem.setVisible(false);
-        deleteListMenuItem.setVisible(false);
-        deleteSelectedMenuItem.setVisible(true);
-    }
+		transaction.replace(R.id.content_main, fragment);
+		transaction.addToBackStack(null);
+		transaction.commit();
 
-    private void configureViewForTemplateListsFragment() {
-        toolbar.setTitle(R.string.template_lists);
-        fab.setVisibility(View.GONE);
-        hideMenuItems();
-        newListMenuItem.setVisible(false);
-        renameListMenuItem.setVisible(false);
-        deleteListMenuItem.setVisible(false);
-        deleteSelectedMenuItem.setVisible(false);
-    }
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawer.closeDrawer(GravityCompat.START);
+	}
 
-    private void showMenuItems() {
-        calendarMenuItem.setVisible(true);
-        shareMenuItem.setVisible(true);
-    }
+	private void configureViewForPackingListFragment() {
+		fab.setVisibility(View.VISIBLE);
+		showMenuItems();
+		newListMenuItem.setVisible(true);
+		renameListMenuItem.setVisible(true);
+		deleteListMenuItem.setVisible(true);
+		deleteSelectedMenuItem.setVisible(true);
+	}
 
-    private void hideMenuItems() {
-        calendarMenuItem.setVisible(false);
-        shareMenuItem.setVisible(false);
-    }
+	private void configureViewForSavedListsFragment() {
+		toolbar.setTitle(R.string.saved_lists);
+		fab.setVisibility(View.VISIBLE);
+		hideMenuItems();
+		newListMenuItem.setVisible(false);
+		renameListMenuItem.setVisible(false);
+		deleteListMenuItem.setVisible(false);
+		deleteSelectedMenuItem.setVisible(true);
+	}
+
+	private void configureViewForTemplateListsFragment() {
+		toolbar.setTitle(R.string.template_lists);
+		fab.setVisibility(View.GONE);
+		hideMenuItems();
+		newListMenuItem.setVisible(false);
+		renameListMenuItem.setVisible(false);
+		deleteListMenuItem.setVisible(false);
+		deleteSelectedMenuItem.setVisible(false);
+	}
+
+	private void showMenuItems() {
+		calendarMenuItem.setVisible(true);
+		shareMenuItem.setVisible(true);
+	}
+
+	private void hideMenuItems() {
+		calendarMenuItem.setVisible(false);
+		shareMenuItem.setVisible(false);
+	}
 }
