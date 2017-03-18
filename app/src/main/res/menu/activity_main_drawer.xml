@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_current_list"
-            android:icon="@drawable/ic_vector_list"
-            android:title="@string/current_list" />
-        <item
-            android:id="@+id/nav_saved_lists"
-            android:icon="@drawable/ic_vector_list"
-            android:title="@string/saved_lists" />
-        <item
-            android:id="@+id/nav_template_lists"
-            android:icon="@drawable/ic_vector_list"
-            android:title="@string/template_lists" />
-    </group>
+	<group android:checkableBehavior="single">
+		<item
+			android:id="@+id/nav_current_list"
+			android:checkable="false"
+			android:icon="@drawable/ic_vector_list"
+			android:title="@string/current_list"/>
+		<item
+			android:id="@+id/nav_saved_lists"
+			android:checkable="false"
+			android:icon="@drawable/ic_vector_list"
+			android:title="@string/saved_lists"/>
+		<item
+			android:id="@+id/nav_template_lists"
+			android:checkable="false"
+			android:icon="@drawable/ic_vector_list"
+			android:title="@string/template_lists"/>
+	</group>
 
 </menu>

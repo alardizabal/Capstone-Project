@@ -151,17 +151,20 @@ public class SavedListsFragment extends Fragment {
 				@Override
 				public void onClick(View v) {
 
-					FragmentManager fragmentManager = getFragmentManager();
-					FragmentTransaction transaction = fragmentManager.beginTransaction();
+//					FragmentManager fragmentManager = getFragmentManager();
+//					FragmentTransaction transaction = fragmentManager.beginTransaction();
+//
+//					PackingListFragment fragment = new PackingListFragment();
+//					PackingListFragment.currentPackingList = list;
+//					PackingListFragment.currentListItems = list.getItems();
+//					PackingListFragment.adapter.notifyDataSetChanged();
+//
+//					transaction.replace(R.id.content_main, fragment);
+//					transaction.addToBackStack(null);
+//					transaction.commit();
 
-					PackingListFragment fragment = new PackingListFragment();
-					PackingListFragment.currentPackingList = list;
-					PackingListFragment.currentListItems = list.getItems();
-					PackingListFragment.adapter.notifyDataSetChanged();
-
-					transaction.replace(R.id.content_main, fragment);
-					transaction.addToBackStack(null);
-					transaction.commit();
+					PackingList packingList = PackingListFragment.packingLists.get(position);
+					listener.onPackingListSelected(packingList);
 				}
 			});
 		}

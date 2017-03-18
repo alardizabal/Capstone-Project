@@ -38,7 +38,6 @@ public class PackingListFragment extends Fragment {
 	public static PackingListAdapter adapter;
 
 	public static ArrayList<PackingList> packingLists = new ArrayList<>();
-
 	public static PackingList currentPackingList = new PackingList();
 	public static ArrayList<PackingListItem> currentListItems = new ArrayList<>();
 
@@ -71,6 +70,10 @@ public class PackingListFragment extends Fragment {
 	@Override
 	public void onStart() {
 		super.onStart();
+		syncData();
+	}
+
+	private void syncData() {
 		packingLists.clear();
 
 		savedListsReference.addValueEventListener(new ValueEventListener() {

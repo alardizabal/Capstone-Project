@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import static com.albertlardizabal.packoverflow.ui.PackingListFragment.currentPackingList;
 
 public class MainActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener {
+		implements NavigationView.OnNavigationItemSelectedListener, SavedListsFragment.OnPackingListSelectedListener {
 
 	private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -314,5 +314,19 @@ public class MainActivity extends AppCompatActivity
 	private void hideMenuItems() {
 		calendarMenuItem.setVisible(false);
 		shareMenuItem.setVisible(false);
+	}
+
+	// OnPackingListSelected interface conformance
+	@Override
+	public void onPackingListSelected(PackingList packingList) {
+		for (PackingList list : PackingListFragment.packingLists) {
+			if (list.getTitle().equals(packingList.getTitle())) {
+				list.setActive(true);
+			} else {
+				list.setActive(false);
+			}
+		}
+		PackingListFragment.updateFirebase();
+		navigateToFragment(PACKING_LIST_FRAGMENT);
 	}
 }
