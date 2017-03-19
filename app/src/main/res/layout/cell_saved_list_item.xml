@@ -4,16 +4,30 @@
 				android:layout_height="88dp"
 				android:orientation="vertical">
 
+	<CheckBox
+		android:id="@+id/list_item_checkbox"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerVertical="true"/>
+
 	<TextView
-		android:id="@+id/template_list_item_title"
+		android:id="@+id/saved_list_item_title"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_centerVertical="true"
+		android:layout_toEndOf="@id/list_item_checkbox"
+		android:layout_toRightOf="@id/list_item_checkbox"
 		android:paddingEnd="@dimen/standard_margin"
 		android:paddingLeft="@dimen/standard_margin"
 		android:paddingRight="@dimen/standard_margin"
 		android:paddingStart="@dimen/standard_margin"
 		android:text="@string/placeholder_title"
 		android:textStyle="bold"/>
+
+	<View
+		android:layout_alignParentBottom="true"
+		android:layout_width="match_parent"
+		android:layout_height="1dp"
+		android:background="@color/colorVeryLightGray"/>
 
 </RelativeLayout>

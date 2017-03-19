@@ -73,7 +73,7 @@ public class SavedListsFragment extends Fragment {
 		private TextView title;
 
 		private SavedListsHolder(LayoutInflater inflater, ViewGroup parent) {
-			super(inflater.inflate(R.layout.saved_list_item, parent, false));
+			super(inflater.inflate(R.layout.cell_saved_list_item, parent, false));
 
 			checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
 			title = (TextView) itemView.findViewById(R.id.saved_list_item_title);

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	  xmlns:tools="http://schemas.android.com/tools"
+	  tools:context="com.albertlardizabal.packoverflow.ui.MainActivity">
 
 	<group android:checkableBehavior="single">
 		<item
@@ -18,5 +20,14 @@
 			android:icon="@drawable/ic_vector_list"
 			android:title="@string/template_lists"/>
 	</group>
+
+	<item android:title="@string/account">
+		<menu>
+			<item
+				android:id="@+id/nav_account"
+				android:icon="@drawable/ic_vector_account"
+				android:title="@string/account" />
+		</menu>
+	</item>
 
 </menu>

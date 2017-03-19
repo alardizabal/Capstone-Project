@@ -154,7 +154,7 @@ public class PackingListFragment extends Fragment {
 		private TextView quantity;
 
 		public PackingListHolder(LayoutInflater inflater, ViewGroup parent) {
-			super(inflater.inflate(R.layout.packing_list_item, parent, false));
+			super(inflater.inflate(R.layout.cell_packing_list_item, parent, false));
 
 			checkBox = (CheckBox) itemView.findViewById(R.id.list_item_checkbox);
 			title = (TextView) itemView.findViewById(R.id.list_item_title);

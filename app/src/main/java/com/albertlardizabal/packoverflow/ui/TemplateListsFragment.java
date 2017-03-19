@@ -162,7 +162,7 @@ public class TemplateListsFragment extends Fragment {
 		private TextView title;
 
 		public TemplateListsHolder(LayoutInflater inflater, ViewGroup parent) {
-			super(inflater.inflate(R.layout.template_list_item, parent, false));
+			super(inflater.inflate(R.layout.cell_template_list_item, parent, false));
 
 			title = (TextView) itemView.findViewById(R.id.template_list_item_title);
 

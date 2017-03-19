@@ -1,29 +1,37 @@
 <resources>
-    <string name="app_name">Pack Overflow</string>
+	<string name="app_name">Pack Overflow</string>
 
-    <string name="placeholder_title">Title</string>
+	<string name="placeholder_title">Title</string>
 
-    <string name="current_list">Active Packing List</string>
-    <string name="saved_lists">Saved Lists</string>
-    <string name="template_lists">List Templates</string>
-    <string name="about">About</string>
+	<string name="current_list">Active Packing List</string>
+	<string name="saved_lists">Saved Lists</string>
+	<string name="template_lists">List Templates</string>
+	<string name="account">Account</string>
+	<string name="sign_in">Sign In</string>
+	<string name="sign_out">Sign Out</string>
+	<string name="signing_in">Signing in. Please wait.</string>
+	<string name="signing_out">Signing out. Please wait.</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+	<string name="toast_sign_in_canceled">Sign in cancelled</string>
+	<string name="toast_network_problems">Network connectivity problems. Please try again.</string>
+	<string name="toast_unknown_error">Unknown error</string>
 
-    <string name="action_calendar">Calendar</string>
-    <string name="action_share">Share</string>
-    <string name="action_new_list">New List</string>
-    <string name="action_rename_list">Rename List</string>
-    <string name="action_delete_selected">Delete Selected Items</string>
-    <string name="action_delete_list">Delete List</string>
+	<string name="navigation_drawer_open">Open navigation drawer</string>
+	<string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="dialog_item_title_hint">Item Title</string>
-    <string name="dialog_item_subtitle_hint">Description</string>
-    <string name="dialog_item_quantity_hint">Quantity</string>
-    <string name="dialog_list_title_hint">List Title</string>
-    <string name="dialog_ok">Ok</string>
-    <string name="dialog_cancel">Cancel</string>
+	<string name="action_calendar">Calendar</string>
+	<string name="action_share">Share</string>
+	<string name="action_new_list">New List</string>
+	<string name="action_rename_list">Rename List</string>
+	<string name="action_delete_selected">Delete Selected Items</string>
+	<string name="action_delete_list">Delete List</string>
 
-    <string name="share_list_title">Share list to</string>
+	<string name="dialog_item_title_hint">Item Title</string>
+	<string name="dialog_item_subtitle_hint">Description</string>
+	<string name="dialog_item_quantity_hint">Quantity</string>
+	<string name="dialog_list_title_hint">List Title</string>
+	<string name="dialog_ok">Ok</string>
+	<string name="dialog_cancel">Cancel</string>
+
+	<string name="share_list_title">Share list to</string>
 </resources>

@@ -1,7 +1,12 @@
 package com.albertlardizabal.packoverflow.ui;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -13,9 +18,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
@@ -23,7 +31,15 @@ import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
 import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.ErrorCodes;
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.ResultCodes;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
@@ -35,11 +51,14 @@ public class MainActivity extends AppCompatActivity
 	private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
 	private FirebaseAnalytics firebaseAnalytics;
+	private FirebaseAuth firebaseAuth;
 
 	public static Toolbar toolbar;
 	private FloatingActionButton fab;
 
+	private DrawerLayout drawer;
 	public static NavigationView navigationView;
+	private SharedPreferences sharedPreferences;
 
 	private MenuItem calendarMenuItem;
 	private MenuItem shareMenuItem;
@@ -48,9 +67,9 @@ public class MainActivity extends AppCompatActivity
 	private MenuItem deleteSelectedMenuItem;
 	private MenuItem deleteListMenuItem;
 
-	private MenuItem currentListNavigationItem;
-	private MenuItem savedListsNavigationItem;
-	private MenuItem templateListsNavigationItem;
+	private MenuItem accountNavigationItem;
+	private TextView accountUserName;
+	private TextView accountUserEmail;
 
 	private static final int RC_SIGN_IN = 123;
 
@@ -60,6 +79,12 @@ public class MainActivity extends AppCompatActivity
 
 	public static int CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
 
+	public static boolean isTablet(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK)
+				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,6 +93,24 @@ public class MainActivity extends AppCompatActivity
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
+		if (!isTablet(this)) {
+			drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		}
+
+		configureFloatingActionButton();
+		configureFirebase();
+		configureNavigationDrawer();
+
+		sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+
+		// TODO - Stage data
+		ArrayList<PackingList> savedLists = Utils.stageData();
+		for (PackingList list : savedLists) {
+			PackingListFragment.savedListsReference.child(list.getTitle()).setValue(list);
+		}
+	}
+
+	private void configureFloatingActionButton() {
 		fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -80,30 +123,49 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		});
+	}
 
-		// Set up Firebase
+	private void configureFirebase() {
+
 		firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+		firebaseAuth = FirebaseAuth.getInstance();
+	}
 
-		// Set up navigation drawer
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-				this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-		drawer.addDrawerListener(toggle);
-		toggle.syncState();
+	private void configureNavigationDrawer() {
+
+		if (drawer != null) {
+			ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+					this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+			drawer.addDrawerListener(toggle);
+			toggle.syncState();
+		}
 
 		navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 
-		// TODO - Stage data
-		ArrayList<PackingList> savedLists = Utils.stageData();
-		for (PackingList list : savedLists) {
-			PackingListFragment.savedListsReference.child(list.getTitle()).setValue(list);
+		configureNavigationHeaderView();
+	}
+
+	private void configureNavigationHeaderView() {
+		accountNavigationItem = navigationView.getMenu().findItem(R.id.nav_account);
+		accountUserName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_name);
+		accountUserEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
+		if (firebaseAuth.getCurrentUser() != null) {
+			// already signed in
+			FirebaseUser user = firebaseAuth.getCurrentUser();
+			accountNavigationItem.setTitle(getResources().getString(R.string.sign_out));
+			accountUserName.setText(user.getDisplayName());
+			accountUserEmail.setText(user.getEmail());
+		} else {
+			Log.d(LOG_TAG, "Not signed in");
+			accountNavigationItem.setTitle(getResources().getString(R.string.sign_in));
+			accountUserName.setText(getResources().getString(R.string.app_name));
+			accountUserEmail.setText("");
 		}
 	}
 
 	@Override
 	public void onBackPressed() {
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		if (drawer.isDrawerOpen(GravityCompat.START)) {
 			drawer.closeDrawer(GravityCompat.START);
 		} else {
@@ -245,6 +307,15 @@ public class MainActivity extends AppCompatActivity
 			navigateToFragment(SAVED_LISTS_FRAGMENT);
 		} else if (id == R.id.nav_template_lists) {
 			navigateToFragment(TEMPLATE_LISTS_FRAGMENT);
+		} else if (id == R.id.nav_account) {
+			// TODO - account
+			if (firebaseAuth.getCurrentUser() != null) {
+				// already signed in
+				signOut();
+			} else {
+				Log.d(LOG_TAG, "Not signed in");
+				signIn();
+			}
 		}
 
 		return true;
@@ -273,8 +344,9 @@ public class MainActivity extends AppCompatActivity
 		transaction.addToBackStack(null);
 		transaction.commit();
 
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-		drawer.closeDrawer(GravityCompat.START);
+		if (drawer != null) {
+			drawer.closeDrawer(GravityCompat.START);
+		}
 	}
 
 	private void configureViewForPackingListFragment() {
@@ -328,5 +400,55 @@ public class MainActivity extends AppCompatActivity
 		}
 		PackingListFragment.updateFirebase();
 		navigateToFragment(PACKING_LIST_FRAGMENT);
+	}
+
+	// Auth
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == RC_SIGN_IN) {
+			IdpResponse response = IdpResponse.fromResultIntent(data);
+
+			// Successfully signed in
+			if (resultCode == ResultCodes.OK) {
+				// TODO - reload data
+			} else {
+				// Sign in failed
+				String errorMessage = getResources().getString(R.string.toast_unknown_error);
+				if (response == null) {
+					// User pressed back button - cancelled
+					errorMessage = getResources().getString(R.string.toast_sign_in_canceled);
+				} else if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
+					errorMessage = getResources().getString(R.string.toast_network_problems);
+				} else if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+					errorMessage = getResources().getString(R.string.toast_unknown_error);
+				}
+				Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		}
+		configureNavigationHeaderView();
+	}
+
+	private void signIn() {
+		startActivityForResult(
+				// Get an instance of AuthUI based on the default app
+				AuthUI.getInstance().createSignInIntentBuilder().build(),
+				RC_SIGN_IN);
+	}
+
+	private void signOut() {
+		final ProgressDialog progress = new ProgressDialog(this);
+		progress.setMessage(getResources().getString(R.string.signing_out));
+		progress.show();
+		AuthUI.getInstance()
+				.signOut(this)
+				.addOnCompleteListener(new OnCompleteListener<Void>() {
+					public void onComplete(@NonNull Task<Void> task) {
+						// user is now signed out
+						configureNavigationHeaderView();
+						progress.dismiss();
+					}
+				});
 	}
 }
