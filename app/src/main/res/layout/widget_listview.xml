@@ -30,6 +30,7 @@
 			android:id="@+id/widget_list"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
+			android:background="@color/colorWhite"
 			android:divider="@null"
 			android:dividerHeight="0dp"
 			tools:listitem="@layout/widget_listview_item"/>
