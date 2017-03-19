@@ -4,11 +4,6 @@
     tools:context="com.albertlardizabal.packoverflow.ui.MainActivity">
 
     <item
-        android:id="@+id/action_calendar"
-        android:icon="@drawable/ic_vector_calendar"
-        android:title="@string/action_calendar"
-        app:showAsAction="ifRoom"/>
-    <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_vector_share"
         android:title="@string/action_share"

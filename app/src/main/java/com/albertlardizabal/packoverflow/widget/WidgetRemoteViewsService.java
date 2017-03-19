@@ -25,10 +25,6 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
 
 			@Override
 			public void onDataSetChanged() {
-
-//				if (data != null)
-//					data.close();
-
 				final long identityToken = Binder.clearCallingIdentity();
 			}
 
@@ -44,9 +40,6 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
 
 			@Override
 			public RemoteViews getViewAt(int position) {
-
-//				if (position == AdapterView.INVALID_POSITION || data == null || !data.moveToPosition(position))
-//					return null;
 
 				RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_listview_item);
 				views.setTextViewText(R.id.widget_list_item_title, "Hello");

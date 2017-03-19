@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity
 	public static NavigationView navigationView;
 	private SharedPreferences sharedPreferences;
 
-	private MenuItem calendarMenuItem;
 	private MenuItem shareMenuItem;
 	private MenuItem newListMenuItem;
 	private MenuItem renameListMenuItem;
@@ -178,7 +177,6 @@ public class MainActivity extends AppCompatActivity
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 
-		calendarMenuItem = menu.findItem(R.id.action_calendar);
 		shareMenuItem = menu.findItem(R.id.action_share);
 
 		newListMenuItem = menu.findItem(R.id.action_new_list);
@@ -201,9 +199,7 @@ public class MainActivity extends AppCompatActivity
 
 		int id = item.getItemId();
 
-		if (id == R.id.action_calendar) {
-			return true;
-		} else if (id == R.id.action_share) {
+		if (id == R.id.action_share) {
 			setShareIntent();
 			return true;
 		} else if (id == R.id.action_new_list) {
@@ -379,12 +375,10 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	private void showMenuItems() {
-		calendarMenuItem.setVisible(true);
 		shareMenuItem.setVisible(true);
 	}
 
 	private void hideMenuItems() {
-		calendarMenuItem.setVisible(false);
 		shareMenuItem.setVisible(false);
 	}
 
