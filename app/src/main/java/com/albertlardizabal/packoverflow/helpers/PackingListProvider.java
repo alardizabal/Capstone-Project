@@ -4,9 +4,17 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.albertlardizabal.packoverflow.database.PackingListContract;
+import com.albertlardizabal.packoverflow.database.PackingListDbHelper;
+import com.albertlardizabal.packoverflow.models.PackingList;
+
+import java.util.ArrayList;
 
 /**
  * Created by albertlardizabal on 3/19/17.
@@ -14,14 +22,16 @@ import android.support.annotation.Nullable;
 
 public class PackingListProvider extends ContentProvider {
 
+	private PackingListDbHelper dbHelper;
+	private ArrayList<String> itemNames = new ArrayList<>();
+
 	private static final String PROVIDER_NAME = "com.albertlardizabal.packoverflow.helpers.PackingListProvider";
 	private static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/list");
-	private static final int IMAGES = 1;
 
 	private static final UriMatcher uriMatcher = getUriMatcher();
 	private static UriMatcher getUriMatcher() {
 		UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-		uriMatcher.addURI(PROVIDER_NAME, "images", IMAGES);
+//		uriMatcher.addURI(PROVIDER_NAME, "items", IMAGES);
 		return uriMatcher;
 	}
 
@@ -33,7 +43,6 @@ public class PackingListProvider extends ContentProvider {
 	@Nullable
 	@Override
 	public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-
 		return null;
 	}
 
@@ -57,5 +66,39 @@ public class PackingListProvider extends ContentProvider {
 	@Override
 	public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
 		return 0;
+	}
+
+	private class PackingListReadTask extends AsyncTask<Void, Void, Cursor> {
+
+		@Override
+		protected Cursor doInBackground(Void... params) {
+			dbHelper = new PackingListDbHelper(getContext());
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+			String[] projection = {
+					PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE,
+			};
+
+			Cursor cursor = db.query(
+					PackingListContract.PackingListEntry.TABLE_NAME,        // Table to query
+					projection,                                             // Columns to return
+					null,                                                   // Columns for WHERE clause
+					null,                                                   // Values for WHERE clause
+					null,                                                   // Don't group rows
+					null,                                                   // Don't filter by row groups
+					null                                                    // The sort order
+			);
+
+			ArrayList<PackingList> packingLists = new ArrayList<>();
+			itemNames.clear();
+			while (cursor.moveToNext()) {
+				String packingListItemTitle = cursor.getString(
+						cursor.getColumnIndexOrThrow(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE));
+
+				itemNames.add(packingListItemTitle);
+			}
+			cursor.close();
+			return cursor;
+		}
 	}
 }
