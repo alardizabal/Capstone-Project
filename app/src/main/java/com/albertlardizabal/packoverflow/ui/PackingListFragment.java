@@ -1,5 +1,7 @@
 package com.albertlardizabal.packoverflow.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +20,8 @@ import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +30,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by albertlardizabal on 2/25/17.
@@ -34,6 +40,8 @@ import java.util.ArrayList;
 public class PackingListFragment extends Fragment {
 
 	private static final String LOG_TAG = PackingListFragment.class.getSimpleName();
+
+	private SharedPreferences sharedPreferences;
 
 	public static PackingListAdapter adapter;
 
@@ -52,6 +60,8 @@ public class PackingListFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_packing_list, container, false);
 		view.setBackgroundColor(Color.WHITE);
 
+		sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+
 		RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.packing_list_recycler_view);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -62,8 +72,14 @@ public class PackingListFragment extends Fragment {
 	}
 
 	public static void updateFirebase() {
+		String userId = "demo";
+		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+		if (firebaseAuth.getCurrentUser() != null) {
+			FirebaseUser user = firebaseAuth.getCurrentUser();
+			userId = user.getUid();
+		}
 		for (PackingList list : packingLists) {
-			savedListsReference.child(list.getTitle()).setValue(list);
+			savedListsReference.child(userId).child(list.getTitle()).setValue(list);
 		}
 	}
 
@@ -76,7 +92,13 @@ public class PackingListFragment extends Fragment {
 	private void syncData() {
 		packingLists.clear();
 
-		savedListsReference.addValueEventListener(new ValueEventListener() {
+		String userId = "demo";
+		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+		if (firebaseAuth.getCurrentUser() != null) {
+			FirebaseUser user = firebaseAuth.getCurrentUser();
+			userId = user.getUid();
+		}
+		savedListsReference.child(userId).addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				Log.d(LOG_TAG, "onDataChanged");
@@ -88,16 +110,37 @@ public class PackingListFragment extends Fragment {
 			}
 		});
 
-		savedListsReference.addChildEventListener(new ChildEventListener() {
+		savedListsReference.child(userId).addChildEventListener(new ChildEventListener() {
 			@Override
 			public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 				PackingList packingList = dataSnapshot.getValue(PackingList.class);
-				packingLists.add(packingList);
+				Boolean doesListExist = false;
+				for (PackingList existingList : packingLists) {
+					if (existingList.getTitle().equals(packingList.getTitle())) {
+						doesListExist = true;
+					}
+				}
+				if (!doesListExist) {
+					packingLists.add(packingList);
+				}
 
 				if (packingList.isActive()) {
 					currentPackingList = packingList;
 					currentListItems = packingList.getItems();
 					MainActivity.toolbar.setTitle(currentPackingList.getTitle());
+
+					SharedPreferences.Editor editor = sharedPreferences.edit();
+					if (currentListItems != null) {
+						if (currentListItems.size() > 0) {
+							Set<String> set = new HashSet<String>();
+							for (PackingListItem item : currentListItems) {
+								set.add(item.getTitle());
+							}
+							editor.putStringSet(getString(R.string.preferences_current_list_items), set);
+							editor.putBoolean(getString(R.string.preferences_is_first_load), false);
+							editor.commit();
+						}
+					}
 				}
 				adapter.notifyDataSetChanged();
 
@@ -111,6 +154,8 @@ public class PackingListFragment extends Fragment {
 					PackingList matchList = packingLists.get(i);
 					if (matchList.getTitle().equals(packingList.getTitle())) {
 						packingLists.set(i, packingList);
+						currentPackingList = matchList;
+						currentListItems = currentPackingList.getItems();
 					}
 				}
 				adapter.notifyDataSetChanged();
@@ -198,7 +243,7 @@ public class PackingListFragment extends Fragment {
 							PackingList list = packingLists.get(i);
 							PackingListItem item = list.getItems().get(position);
 							item.setIsChecked(!item.getIsChecked());
-//                            updateFirebase();
+                            updateFirebase();
 							return;
 						}
 					}
@@ -220,7 +265,11 @@ public class PackingListFragment extends Fragment {
 
 		@Override
 		public int getItemCount() {
-			return PackingListFragment.currentListItems.size();
+			if (currentListItems != null) {
+				return PackingListFragment.currentListItems.size();
+			} else {
+				return 0;
+			}
 		}
 	}
 }

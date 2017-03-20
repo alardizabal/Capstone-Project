@@ -1,7 +1,10 @@
 package com.albertlardizabal.packoverflow.widget;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Binder;
+import android.support.v4.content.CursorLoader;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -13,14 +16,27 @@ import com.albertlardizabal.packoverflow.R;
 
 public class WidgetRemoteViewsService extends RemoteViewsService {
 
+	private static final String LOG_TAG = WidgetRemoteViewsService.class.getSimpleName();
+	private static final String PROVIDER_NAME = "com.albertlardizabal.packoverflow.helpers.PackingListProvider";
+	private static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/list");
+
 	@Override
 	public RemoteViewsFactory onGetViewFactory(Intent intent) {
 		return new RemoteViewsFactory() {
 
-//			private Cursor data = null;
+			private Cursor data = null;
 			@Override
 			public void onCreate() {
 
+				CursorLoader cursorLoader = new CursorLoader(
+						getBaseContext(),
+						CONTENT_URI,
+						null,
+						null,
+						null,
+						null
+				);
+				data = cursorLoader.loadInBackground();
 			}
 
 			@Override

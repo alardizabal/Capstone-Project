@@ -96,16 +96,29 @@ public class MainActivity extends AppCompatActivity
 			drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		}
 
+		sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+
 		configureFloatingActionButton();
 		configureFirebase();
 		configureNavigationDrawer();
 
-		sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+		stageData();
+	}
 
-		// TODO - Stage data
-		ArrayList<PackingList> savedLists = Utils.stageData();
-		for (PackingList list : savedLists) {
-			PackingListFragment.savedListsReference.child(list.getTitle()).setValue(list);
+	private void stageData() {
+
+		Boolean isFirstLoad = sharedPreferences.getBoolean(getString(R.string.preferences_is_first_load), true);
+
+		if (isFirstLoad) {
+			ArrayList<PackingList> savedLists = Utils.stageData();
+			String userId = "demo";
+			if (firebaseAuth.getCurrentUser() != null) {
+				FirebaseUser user = firebaseAuth.getCurrentUser();
+				userId = user.getUid();
+			}
+			for (PackingList list : savedLists) {
+				PackingListFragment.savedListsReference.child(userId).child(list.getTitle()).setValue(list);
+			}
 		}
 	}
 
@@ -313,7 +326,6 @@ public class MainActivity extends AppCompatActivity
 				signIn();
 			}
 		}
-
 		return true;
 	}
 
@@ -405,7 +417,7 @@ public class MainActivity extends AppCompatActivity
 
 			// Successfully signed in
 			if (resultCode == ResultCodes.OK) {
-				// TODO - reload data
+				PackingListFragment.updateFirebase();
 			} else {
 				// Sign in failed
 				String errorMessage = getResources().getString(R.string.toast_unknown_error);

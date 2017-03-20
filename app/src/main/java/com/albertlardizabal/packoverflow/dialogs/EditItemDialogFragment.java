@@ -64,7 +64,10 @@ public class EditItemDialogFragment extends DialogFragment {
 						for (int i = 0; i < lists.size(); i++) {
 							PackingList list = lists.get(i);
 							if (list.getTitle().equals(currentListTitle)) {
-								ArrayList<PackingListItem> items = list.getItems();
+								ArrayList<PackingListItem> items = new ArrayList<>();
+								if (list != null) {
+									items = list.getItems();
+								}
 								if (item != null) {
 									for (int j = 0; j < items.size(); j++) {
 										PackingListItem editItem = items.get(j);

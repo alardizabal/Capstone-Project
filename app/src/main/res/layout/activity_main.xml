@@ -39,6 +39,7 @@
 			android:layout_gravity="bottom|end"
 			android:layout_margin="@dimen/fab_margin"
 			app:layout_behavior="com.albertlardizabal.packoverflow.helpers.FabScrollBehavior"
+			android:contentDescription="@string/description_floating_button"
 			app:srcCompat="@drawable/ic_vector_add"/>
 
 	</android.support.design.widget.CoordinatorLayout>

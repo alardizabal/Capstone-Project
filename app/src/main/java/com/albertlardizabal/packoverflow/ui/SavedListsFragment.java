@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -150,19 +148,6 @@ public class SavedListsFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-
-//					FragmentManager fragmentManager = getFragmentManager();
-//					FragmentTransaction transaction = fragmentManager.beginTransaction();
-//
-//					PackingListFragment fragment = new PackingListFragment();
-//					PackingListFragment.currentPackingList = list;
-//					PackingListFragment.currentListItems = list.getItems();
-//					PackingListFragment.adapter.notifyDataSetChanged();
-//
-//					transaction.replace(R.id.content_main, fragment);
-//					transaction.addToBackStack(null);
-//					transaction.commit();
-
 					PackingList packingList = PackingListFragment.packingLists.get(position);
 					listener.onPackingListSelected(packingList);
 				}
@@ -174,22 +159,4 @@ public class SavedListsFragment extends Fragment {
 			return lists.size();
 		}
 	}
-
-	private void navigateToPackingListFragment() {
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-		Fragment fragment = new PackingListFragment();
-//        fab.setVisibility(View.VISIBLE);
-//        CURRENT_FRAGMENT = PACKING_LIST_FRAGMENT;
-//        showMenuItems();
-//        newListMenuItem.setVisible(true);
-//        renameListMenuItem.setVisible(true);
-//        deleteListMenuItem.setVisible(true);
-
-		transaction.replace(R.id.content_main, fragment);
-		transaction.addToBackStack(null);
-		transaction.commit();
-	}
-
 }

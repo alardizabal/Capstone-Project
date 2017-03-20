@@ -7,6 +7,7 @@
 	<CheckBox
 		android:id="@+id/list_item_checkbox"
 		android:layout_width="wrap_content"
+		android:contentDescription="@string/description_select_item"
 		android:layout_height="wrap_content"/>
 
 	<TextView
@@ -16,7 +17,7 @@
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentRight="true"
 		android:layout_alignParentTop="true"
-		android:text="x2"/>
+		android:text="@string/placeholder_quantity"/>
 
 	<TextView
 		android:id="@+id/list_item_title"
@@ -31,7 +32,7 @@
 		android:paddingLeft="@dimen/standard_margin"
 		android:paddingRight="@dimen/standard_margin"
 		android:paddingStart="@dimen/standard_margin"
-		android:text="Title"
+		android:text="@string/placeholder_title"
 		android:textStyle="bold"/>
 
 	<TextView
@@ -48,7 +49,7 @@
 		android:paddingRight="@dimen/standard_margin"
 		android:paddingStart="@dimen/standard_margin"
 		android:paddingTop="@dimen/standard_margin"
-		android:text="Subtitle"/>
+		android:text="@string/placeholder_subtitle"/>
 
 	<View
 		android:layout_alignParentBottom="true"

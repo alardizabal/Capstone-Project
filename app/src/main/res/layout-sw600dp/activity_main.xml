@@ -51,6 +51,7 @@
 			android:layout_height="wrap_content"
 			android:layout_gravity="bottom|end"
 			android:layout_margin="@dimen/fab_margin"
+			android:contentDescription="@string/description_floating_button"
 			app:layout_behavior="com.albertlardizabal.packoverflow.helpers.FabScrollBehavior"
 			app:srcCompat="@drawable/ic_vector_add"/>
 

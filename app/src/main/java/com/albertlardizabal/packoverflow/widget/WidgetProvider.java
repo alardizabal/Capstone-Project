@@ -29,13 +29,8 @@ public class WidgetProvider extends AppWidgetProvider {
 					R.layout.widget_listview);
 			views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 			setRemoteAdapter(context, views);
-			// TODO - Set empty state view
 
-//			Intent clickIntent = new Intent(context, PackingListFragment.class);
-//			PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
-//					.addNextIntentWithParentStack(clickIntent)
-//					.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-//			views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
+			// TODO - Set empty state view
 			appWidgetManager.updateAppWidget(widgetId, views);
 		}
 	}
