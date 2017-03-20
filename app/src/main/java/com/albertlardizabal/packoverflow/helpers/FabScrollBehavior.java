@@ -32,7 +32,6 @@ public class FabScrollBehavior extends FloatingActionButton.Behavior {
 		super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed,
 				dyUnconsumed);
 
-		System.out.println("scroll");
 		if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
 			child.hide();
 		} else if (dyConsumed < 0 && child.getVisibility() != View.VISIBLE) {

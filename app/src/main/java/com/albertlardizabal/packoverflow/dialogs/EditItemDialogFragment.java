@@ -65,7 +65,7 @@ public class EditItemDialogFragment extends DialogFragment {
 							PackingList list = lists.get(i);
 							if (list.getTitle().equals(currentListTitle)) {
 								ArrayList<PackingListItem> items = new ArrayList<>();
-								if (list != null) {
+								if (list.getItems() != null) {
 									items = list.getItems();
 								}
 								if (item != null) {
@@ -79,7 +79,7 @@ public class EditItemDialogFragment extends DialogFragment {
 												editItem.setSubtitle(subtitle.getText().toString());
 											}
 											if (quantity.getText().length() > 0) {
-												editItem.setSubtitle(quantity.getText().toString());
+												editItem.setQuantity(quantity.getText().toString());
 											}
 											PackingListFragment.updateFirebase();
 											return;
@@ -99,6 +99,15 @@ public class EditItemDialogFragment extends DialogFragment {
 										newItem.setQuantity("1");
 									}
 									items.add(newItem);
+									for (PackingList existingList : lists) {
+										if (existingList.getTitle().equals(list.getTitle())) {
+											if (list.getItems() != null) {
+												list.getItems().add(item);
+											} else {
+												list.setItems(items);
+											}
+										}
+									}
 									PackingListFragment.updateFirebase();
 									return;
 								}

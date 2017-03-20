@@ -30,8 +30,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by albertlardizabal on 2/25/17.
@@ -42,6 +40,7 @@ public class PackingListFragment extends Fragment {
 	private static final String LOG_TAG = PackingListFragment.class.getSimpleName();
 
 	private SharedPreferences sharedPreferences;
+	private Boolean hasLoaded = false;
 
 	public static PackingListAdapter adapter;
 
@@ -83,14 +82,28 @@ public class PackingListFragment extends Fragment {
 		}
 	}
 
+	public static void updateFirebaseWithList(PackingList oldList, PackingList newList) {
+		String userId = "demo";
+		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+		if (firebaseAuth.getCurrentUser() != null) {
+			FirebaseUser user = firebaseAuth.getCurrentUser();
+			userId = user.getUid();
+		}
+		savedListsReference.child(userId).child(oldList.getTitle()).removeValue();
+		savedListsReference.child(userId).child(newList.getTitle()).setValue(newList);
+	}
+
 	@Override
 	public void onStart() {
 		super.onStart();
-		syncData();
+		if (!hasLoaded) {
+			syncData();
+			hasLoaded = true;
+		}
 	}
 
 	private void syncData() {
-		packingLists.clear();
+//		packingLists.clear();
 
 		String userId = "demo";
 		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -106,7 +119,7 @@ public class PackingListFragment extends Fragment {
 
 			@Override
 			public void onCancelled(DatabaseError databaseError) {
-				Log.d(LOG_TAG, "onCancelled");
+				Log.d(LOG_TAG, "onCanceled");
 			}
 		});
 
@@ -118,6 +131,7 @@ public class PackingListFragment extends Fragment {
 				for (PackingList existingList : packingLists) {
 					if (existingList.getTitle().equals(packingList.getTitle())) {
 						doesListExist = true;
+						break;
 					}
 				}
 				if (!doesListExist) {
@@ -129,18 +143,18 @@ public class PackingListFragment extends Fragment {
 					currentListItems = packingList.getItems();
 					MainActivity.toolbar.setTitle(currentPackingList.getTitle());
 
-					SharedPreferences.Editor editor = sharedPreferences.edit();
-					if (currentListItems != null) {
-						if (currentListItems.size() > 0) {
-							Set<String> set = new HashSet<String>();
-							for (PackingListItem item : currentListItems) {
-								set.add(item.getTitle());
-							}
-							editor.putStringSet(getString(R.string.preferences_current_list_items), set);
-							editor.putBoolean(getString(R.string.preferences_is_first_load), false);
-							editor.commit();
-						}
-					}
+//					SharedPreferences.Editor editor = sharedPreferences.edit();
+//					if (currentListItems != null) {
+//						if (currentListItems.size() > 0) {
+//							Set<String> set = new HashSet<String>();
+//							for (PackingListItem item : currentListItems) {
+//								set.add(item.getTitle());
+//							}
+//							editor.putStringSet(getString(R.string.preferences_current_list_items), set);
+//							editor.putBoolean(getString(R.string.preferences_is_first_load), false);
+//							editor.commit();
+//						}
+//					}
 				}
 				adapter.notifyDataSetChanged();
 
@@ -172,7 +186,9 @@ public class PackingListFragment extends Fragment {
 //                    }
 //                }
 				adapter.notifyDataSetChanged();
-				SavedListsFragment.adapter.notifyDataSetChanged();
+				if (SavedListsFragment.adapter != null) {
+					SavedListsFragment.adapter.notifyDataSetChanged();
+				}
 				Log.d(LOG_TAG, "onChildRemoved");
 			}
 
@@ -235,32 +251,37 @@ public class PackingListFragment extends Fragment {
 			System.out.println("Checked " + position + " " + listItem.getIsChecked());
 			holder.checkBox.setChecked(listItem.getIsChecked());
 
-			holder.checkBox.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					for (int i = 0; i < packingLists.size(); i++) {
-						if (packingLists.get(i).getTitle().equals(currentPackingList.getTitle())) {
-							PackingList list = packingLists.get(i);
-							PackingListItem item = list.getItems().get(position);
-							item.setIsChecked(!item.getIsChecked());
-                            updateFirebase();
-							return;
+			if (!holder.checkBox.hasOnClickListeners()) {
+				holder.checkBox.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						for (int i = 0; i < packingLists.size(); i++) {
+							if (packingLists.get(i).getTitle().equals(currentPackingList.getTitle())) {
+								PackingList list = packingLists.get(i);
+								PackingListItem item = list.getItems().get(position);
+								item.setIsChecked(!item.getIsChecked());
+								currentListItems = list.getItems();
+								updateFirebase();
+								break;
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 
-			holder.itemView.setOnClickListener(new View.OnClickListener() {
+			if (!holder.itemView.hasOnClickListeners()) {
+				holder.itemView.setOnClickListener(new View.OnClickListener() {
 
-				@Override
-				public void onClick(View v) {
-					Bundle itemBundle = new Bundle();
-					itemBundle.putParcelable("listItem", listItem);
-					DialogFragment dialogFragment = new EditItemDialogFragment();
-					dialogFragment.setArguments(itemBundle);
-					dialogFragment.show(getFragmentManager(), "editListItem");
-				}
-			});
+					@Override
+					public void onClick(View v) {
+						Bundle itemBundle = new Bundle();
+						itemBundle.putParcelable("listItem", listItem);
+						DialogFragment dialogFragment = new EditItemDialogFragment();
+						dialogFragment.setArguments(itemBundle);
+						dialogFragment.show(getFragmentManager(), "editListItem");
+					}
+				});
+			}
 		}
 
 		@Override

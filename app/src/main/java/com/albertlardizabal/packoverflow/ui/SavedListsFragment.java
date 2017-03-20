@@ -116,6 +116,7 @@ public class SavedListsFragment extends Fragment {
 			final PackingList list = lists.get(position);
 
 			holder.title.setText(list.getTitle());
+			holder.checkBox.setChecked(list.getIsChecked());
 
 			holder.checkBox.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -124,6 +125,7 @@ public class SavedListsFragment extends Fragment {
 					for (int i = 0; i < lists.size(); i++) {
 						if (lists.get(i).getTitle().equals(list.getTitle())) {
 							list.setIsChecked(!list.getIsChecked());
+							PackingListFragment.updateFirebase();
 							return;
 						}
 					}

@@ -116,9 +116,13 @@ public class MainActivity extends AppCompatActivity
 				FirebaseUser user = firebaseAuth.getCurrentUser();
 				userId = user.getUid();
 			}
+			Log.d(LOG_TAG, "Stage Data");
 			for (PackingList list : savedLists) {
 				PackingListFragment.savedListsReference.child(userId).child(list.getTitle()).setValue(list);
 			}
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putBoolean(getString(R.string.preferences_is_first_load), false);
+			editor.commit();
 		}
 	}
 

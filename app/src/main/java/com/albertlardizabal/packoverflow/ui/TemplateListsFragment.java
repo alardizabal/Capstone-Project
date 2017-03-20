@@ -55,13 +55,13 @@ public class TemplateListsFragment extends Fragment implements LoaderManager.Loa
 	@Override
 	public Loader<ArrayList<PackingList>> onCreateLoader(int id, Bundle args) {
 		SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-		Boolean isFirstLoad = sharedPreferences.getBoolean(getString(R.string.preferences_is_first_load), true);
+		Boolean isFirstLoad = sharedPreferences.getBoolean(getString(R.string.preferences_is_first_load_database), true);
 
 		if (!isFirstLoad) {
 			return new ListTemplateReadTask(getContext());
 		} else {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putBoolean(getString(R.string.preferences_is_first_load), false);
+			editor.putBoolean(getString(R.string.preferences_is_first_load_database), false);
 			editor.commit();
 
 			return new ListTemplateWriteTask(getContext());

@@ -53,6 +53,7 @@ public class EditListDialogFragment extends DialogFragment {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						ArrayList<PackingList> lists = PackingListFragment.packingLists;
+						PackingList tempList = null;
 						if (list == null) {
 							PackingList newList = new PackingList();
 							if (title.getText().length() > 0) {
@@ -61,13 +62,18 @@ public class EditListDialogFragment extends DialogFragment {
 							lists.add(newList);
 						} else {
 							for (int i = 0; i < lists.size(); i++) {
-								PackingList tempList = lists.get(i);
+								tempList = lists.get(i);
 								if (tempList.getTitle().equals(list.getTitle())) {
 									tempList.setTitle(title.getText().toString());
+									break;
 								}
 							}
 						}
-						PackingListFragment.updateFirebase();
+						if (list != null) {
+							PackingListFragment.updateFirebaseWithList(list, tempList);
+						} else {
+							PackingListFragment.updateFirebase();
+						}
 					}
 				})
 				.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
