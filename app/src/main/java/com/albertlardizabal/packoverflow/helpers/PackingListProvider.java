@@ -29,19 +29,19 @@ public class PackingListProvider extends ContentProvider {
 	private static final UriMatcher uriMatcher = getUriMatcher();
 	private static UriMatcher getUriMatcher() {
 		UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-//		uriMatcher.addURI(PROVIDER_NAME, "items", IMAGES);
+		uriMatcher.addURI(PROVIDER_NAME, "items", 1);
 		return uriMatcher;
 	}
 
 	@Override
 	public boolean onCreate() {
+		dbHelper = new PackingListDbHelper(getContext());
 		return true;
 	}
 
 	@Nullable
 	@Override
 	public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-		dbHelper = new PackingListDbHelper(getContext());
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 
 		String[] listProjection = {
@@ -65,7 +65,6 @@ public class PackingListProvider extends ContentProvider {
 
 			itemNames.add(packingListItemTitle);
 		}
-		cursor.close();
 		return cursor;
 	}
 

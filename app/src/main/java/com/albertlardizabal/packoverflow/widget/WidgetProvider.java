@@ -30,7 +30,6 @@ public class WidgetProvider extends AppWidgetProvider {
 			views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 			setRemoteAdapter(context, views);
 
-			// TODO - Set empty state view
 			appWidgetManager.updateAppWidget(widgetId, views);
 		}
 	}

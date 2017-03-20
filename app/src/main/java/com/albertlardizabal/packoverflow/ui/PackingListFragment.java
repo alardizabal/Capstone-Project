@@ -108,7 +108,6 @@ public class PackingListFragment extends Fragment {
 	}
 
 	private void syncData() {
-//		packingLists.clear();
 
 		new PackingListWriteTask().execute();
 
@@ -149,19 +148,6 @@ public class PackingListFragment extends Fragment {
 					currentPackingList = packingList;
 					currentListItems = packingList.getItems();
 					MainActivity.toolbar.setTitle(currentPackingList.getTitle());
-
-//					SharedPreferences.Editor editor = sharedPreferences.edit();
-//					if (currentListItems != null) {
-//						if (currentListItems.size() > 0) {
-//							Set<String> set = new HashSet<String>();
-//							for (PackingListItem item : currentListItems) {
-//								set.add(item.getTitle());
-//							}
-//							editor.putStringSet(getString(R.string.preferences_current_list_items), set);
-//							editor.putBoolean(getString(R.string.preferences_is_first_load), false);
-//							editor.commit();
-//						}
-//					}
 				}
 				adapter.notifyDataSetChanged();
 
@@ -304,24 +290,12 @@ public class PackingListFragment extends Fragment {
 			dbHelper = new PackingListDbHelper(getContext());
 			SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-			// Create a new map of values, where column names are the keys
-			ContentValues values = new ContentValues();
-			values.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
+			for (PackingList list : packingLists) {
+				ContentValues values = new ContentValues();
+				values.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, list.getTitle());
+				db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values);
+			}
 
-			ContentValues values2 = new ContentValues();
-			values2.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Skis");
-
-			ContentValues values3 = new ContentValues();
-			values3.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Harness");
-
-			ContentValues values4 = new ContentValues();
-			values4.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Parachute");
-
-			// Insert the new row, returning the primary key value of the new row
-			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values);
-			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values2);
-			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values3);
-			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values4);
 			return null;
 		}
 	}
