@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 public final class Utils {
 
+	// Dummy data
 	public static ArrayList<PackingList> stageData() {
 
 		ArrayList<PackingList> packingLists = new ArrayList<>();
@@ -63,28 +64,6 @@ public final class Utils {
 		packingLists.add(packingList);
 		packingLists.add(packingList2);
 		packingLists.add(packingList3);
-
-		return packingLists;
-	}
-
-	public static ArrayList<PackingList> stageDemo() {
-
-		ArrayList<PackingList> packingLists = new ArrayList<>();
-
-		PackingListItem packingListItem = new PackingListItem();
-		packingListItem.setTitle("Name of the item to pack");
-		packingListItem.setSubtitle("Description of the item");
-		packingListItem.setQuantity("1");
-
-		PackingList packingList = new PackingList();
-		packingList.setActive(false);
-		packingList.setTitle("Welcome");
-		ArrayList<PackingListItem> plist = new ArrayList<>();
-		plist.add(packingListItem);
-
-		packingList.setItems(plist);
-
-		packingLists.add(packingList);
 
 		return packingLists;
 	}
