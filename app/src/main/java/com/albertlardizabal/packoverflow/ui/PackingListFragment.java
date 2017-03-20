@@ -1,8 +1,11 @@
 package com.albertlardizabal.packoverflow.ui;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -17,6 +20,8 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.albertlardizabal.packoverflow.R;
+import com.albertlardizabal.packoverflow.database.PackingListContract;
+import com.albertlardizabal.packoverflow.database.PackingListDbHelper;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
@@ -105,6 +110,8 @@ public class PackingListFragment extends Fragment {
 	private void syncData() {
 //		packingLists.clear();
 
+		new PackingListWriteTask().execute();
+
 		String userId = "demo";
 		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 		if (firebaseAuth.getCurrentUser() != null) {
@@ -178,13 +185,6 @@ public class PackingListFragment extends Fragment {
 
 			@Override
 			public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                PackingList removedList = dataSnapshot.getValue(PackingList.class);
-//                for (int i = 0; i < packingLists.size(); i++) {
-//                    PackingList list = packingLists.get(i);
-//                    if (list.getTitle().equals(removedList.getTitle())) {
-//
-//                    }
-//                }
 				adapter.notifyDataSetChanged();
 				if (SavedListsFragment.adapter != null) {
 					SavedListsFragment.adapter.notifyDataSetChanged();
@@ -291,6 +291,38 @@ public class PackingListFragment extends Fragment {
 			} else {
 				return 0;
 			}
+		}
+	}
+
+	public class PackingListWriteTask extends AsyncTask<Void, Void, Void> {
+
+		private PackingListDbHelper dbHelper;
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// Gets the data repository in write mode
+			dbHelper = new PackingListDbHelper(getContext());
+			SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+			// Create a new map of values, where column names are the keys
+			ContentValues values = new ContentValues();
+			values.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Buoyancy Compensator");
+
+			ContentValues values2 = new ContentValues();
+			values2.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Skis");
+
+			ContentValues values3 = new ContentValues();
+			values3.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Harness");
+
+			ContentValues values4 = new ContentValues();
+			values4.put(PackingListContract.PackingListEntry.COLUMN_NAME_ITEM_TITLE, "Parachute");
+
+			// Insert the new row, returning the primary key value of the new row
+			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values);
+			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values2);
+			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values3);
+			db.insert(PackingListContract.PackingListEntry.TABLE_NAME, null, values4);
+			return null;
 		}
 	}
 }
