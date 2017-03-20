@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+// code signing
+if (file('signing.gradle').exists()) {
+    apply from: 'signing.gradle'
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -11,10 +16,20 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    // APK signing
+    signingConfigs {
+        release {
+            keyAlias project.signing.keyAlias
+            keyPassword project.signing.keyPassword
+            storeFile file('../keys/packoverflow.jks')
+            storePassword project.signing.storePassword
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }

@@ -1,0 +1,5 @@
+ext.signing = [
+		storePassword: 'udacity',
+		keyAlias: 'PackOverFlowAndroidKey',
+		keyPassword: 'udacity'
+]

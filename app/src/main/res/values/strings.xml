@@ -41,7 +41,7 @@
 	<string name="preferences_is_first_load_database">isFirstLoadDatabase</string>
 	<string name="preferences_current_list_items">preferencesCurrentListItems</string>
 
-	<string name="firebase_demo_user">firebaseDemoUser</string>
+	<string name="firebase_demo_user">demo</string>
 
 	<string name="description_floating_button">New item</string>
 	<string name="description_select_item">Select item</string>

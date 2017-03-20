@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
 import com.albertlardizabal.packoverflow.dialogs.EditListDialogFragment;
+import com.albertlardizabal.packoverflow.helpers.MyApplication;
 import com.albertlardizabal.packoverflow.helpers.Utils;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 	private void stageData() {
 
 		ArrayList<PackingList> savedLists = Utils.stageData();
-		String userId = "demo";
+		String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
 		if (firebaseAuth.getCurrentUser() != null) {
 			FirebaseUser user = firebaseAuth.getCurrentUser();
 			userId = user.getUid();
@@ -286,7 +287,7 @@ public class MainActivity extends AppCompatActivity
 				PackingList deleteList = lists.get(j);
 				if (deleteList.getIsChecked()) {
 					lists.remove(j);
-					String userId = "demo";
+					String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
 					FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 					if (firebaseAuth.getCurrentUser() != null) {
 						FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -306,7 +307,7 @@ public class MainActivity extends AppCompatActivity
 			if (list.getTitle().equals(currentPackingList.getTitle())) {
 				lists.remove(i);
 
-				String userId = "demo";
+				String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
 				FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 				if (firebaseAuth.getCurrentUser() != null) {
 					FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -426,7 +427,7 @@ public class MainActivity extends AppCompatActivity
 	// OnTemplateListsFragmentListener interface conformance
 	@Override
 	public void onTemplateListSelected(PackingList packingList) {
-		String userId = "demo";
+		String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
 		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 		if (firebaseAuth.getCurrentUser() != null) {
 			FirebaseUser user = firebaseAuth.getCurrentUser();

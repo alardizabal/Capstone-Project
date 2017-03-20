@@ -23,6 +23,7 @@ import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.database.PackingListContract;
 import com.albertlardizabal.packoverflow.database.PackingListDbHelper;
 import com.albertlardizabal.packoverflow.dialogs.EditItemDialogFragment;
+import com.albertlardizabal.packoverflow.helpers.MyApplication;
 import com.albertlardizabal.packoverflow.models.PackingList;
 import com.albertlardizabal.packoverflow.models.PackingListItem;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,7 +77,7 @@ public class PackingListFragment extends Fragment {
 	}
 
 	public static void updateFirebase() {
-		String userId = "demo";
+		String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
 		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 		if (firebaseAuth.getCurrentUser() != null) {
 			FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -88,7 +89,7 @@ public class PackingListFragment extends Fragment {
 	}
 
 	public static void updateFirebaseWithList(PackingList oldList, PackingList newList) {
-		String userId = "demo";
+		String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
 		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 		if (firebaseAuth.getCurrentUser() != null) {
 			FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -111,7 +112,7 @@ public class PackingListFragment extends Fragment {
 
 		new PackingListWriteTask().execute();
 
-		String userId = "demo";
+		String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
 		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 		if (firebaseAuth.getCurrentUser() != null) {
 			FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -289,6 +290,7 @@ public class PackingListFragment extends Fragment {
 			// Gets the data repository in write mode
 			dbHelper = new PackingListDbHelper(getContext());
 			SQLiteDatabase db = dbHelper.getWritableDatabase();
+			db.execSQL("delete from "+ PackingListContract.PackingListEntry.TABLE_NAME);
 
 			for (PackingList list : packingLists) {
 				ContentValues values = new ContentValues();
