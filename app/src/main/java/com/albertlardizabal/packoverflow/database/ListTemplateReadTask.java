@@ -30,6 +30,8 @@ public class ListTemplateReadTask extends AsyncTaskLoader<ArrayList<PackingList>
 		String[] projection = {
 				ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE,
 				ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE,
+				ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_SUBTITLE,
+				ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_QUANTITY,
 		};
 
 		Cursor cursor = db.query(
@@ -48,9 +50,15 @@ public class ListTemplateReadTask extends AsyncTaskLoader<ArrayList<PackingList>
 					cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE));
 			String packingListItemTitle = cursor.getString(
 					cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE));
+			String packingListItemSubtitle = cursor.getString(
+					cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_SUBTITLE));
+			String packingListItemQuantity = cursor.getString(
+					cursor.getColumnIndexOrThrow(ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_QUANTITY));
 
 			PackingListItem packingListItem = new PackingListItem();
 			packingListItem.setTitle(packingListItemTitle);
+			packingListItem.setSubtitle(packingListItemSubtitle);
+			packingListItem.setQuantity(packingListItemQuantity);
 
 			ArrayList<PackingListItem> items = new ArrayList<>();
 			items.add(packingListItem);

@@ -17,7 +17,9 @@ public class ListTemplateDbHelper extends SQLiteOpenHelper {
 			"CREATE TABLE " + ListTemplateContract.ListTemplateEntry.TABLE_NAME + " (" +
 					ListTemplateContract.ListTemplateEntry._ID + " INTEGER PRIMARY KEY," +
 					ListTemplateContract.ListTemplateEntry.COLUMN_NAME_TITLE + " TEXT," +
-					ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE + " TEXT)";
+					ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_TITLE + " TEXT," +
+					ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_SUBTITLE + " TEXT," +
+					ListTemplateContract.ListTemplateEntry.COLUMN_NAME_ITEM_QUANTITY + " TEXT)";
 
 	private static final String SQL_DELETE_ENTRIES =
 			"DROP TABLE IF EXISTS " + ListTemplateContract.ListTemplateEntry.TABLE_NAME;

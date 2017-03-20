@@ -15,5 +15,7 @@ public final class ListTemplateContract {
 		public static final String TABLE_NAME = "template";
 		public static final String COLUMN_NAME_TITLE = "title";
 		public static final String COLUMN_NAME_ITEM_TITLE = "item_title";
+		public static final String COLUMN_NAME_ITEM_SUBTITLE = "item_subtitle";
+		public static final String COLUMN_NAME_ITEM_QUANTITY = "item_quantity";
 	}
 }

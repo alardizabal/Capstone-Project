@@ -59,6 +59,10 @@ public class EditListDialogFragment extends DialogFragment {
 							if (title.getText().length() > 0) {
 								newList.setTitle(title.getText().toString());
 							}
+							for (PackingList aList : lists) {
+								aList.setActive(false);
+							}
+							newList.setActive(true);
 							lists.add(newList);
 						} else {
 							for (int i = 0; i < lists.size(); i++) {

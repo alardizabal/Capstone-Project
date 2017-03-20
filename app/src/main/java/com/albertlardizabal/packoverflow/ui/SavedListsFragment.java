@@ -30,20 +30,20 @@ public class SavedListsFragment extends Fragment {
 
 	private static final String LOG_TAG = SavedListsFragment.class.getSimpleName();
 
-	public interface OnPackingListSelectedListener {
+	public interface OnSavedListsFragmentListener {
 		public void onPackingListSelected(PackingList packingList);
 	}
 
-	private OnPackingListSelectedListener listener;
+	private OnSavedListsFragmentListener listener;
 	public static SavedListsAdapter adapter;
 
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
 		try {
-			listener = (OnPackingListSelectedListener) getActivity();
+			listener = (OnSavedListsFragmentListener) getActivity();
 		} catch (ClassCastException e) {
-			throw new ClassCastException(getActivity().toString() + " must implement OnPackingListSelectedListener");
+			throw new ClassCastException(getActivity().toString() + " must implement OnSavedListsFragmentListener");
 		}
 	}
 

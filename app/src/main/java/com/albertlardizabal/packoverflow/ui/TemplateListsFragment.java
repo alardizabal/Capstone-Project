@@ -30,9 +30,25 @@ public class TemplateListsFragment extends Fragment implements LoaderManager.Loa
 
 	private static final String LOG_TAG = TemplateListsFragment.class.getSimpleName();
 
+	public interface OnTemplateListsFragmentListener {
+		public void onTemplateListSelected(PackingList packingList);
+	}
+
+	private OnTemplateListsFragmentListener listener;
+
 	private ArrayList<PackingList> lists = new ArrayList<>();
 
 	private TemplateListsAdapter adapter;
+
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		try {
+			listener = (OnTemplateListsFragmentListener) getActivity();
+		} catch (ClassCastException e) {
+			throw new ClassCastException(getActivity().toString() + " must implement OnTemplateListsFragmentListener");
+		}
+	}
 
 	@Nullable
 	@Override
@@ -118,9 +134,18 @@ public class TemplateListsFragment extends Fragment implements LoaderManager.Loa
 		}
 
 		@Override
-		public void onBindViewHolder(TemplateListsHolder holder, int position) {
+		public void onBindViewHolder(TemplateListsHolder holder, final int position) {
 			PackingList listItem = lists.get(position);
 			holder.title.setText(listItem.getTitle());
+
+			holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					PackingList packingList = lists.get(position);
+					listener.onTemplateListSelected(packingList);
+				}
+			});
 		}
 
 		@Override

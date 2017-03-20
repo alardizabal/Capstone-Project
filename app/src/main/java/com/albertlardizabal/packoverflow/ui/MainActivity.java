@@ -46,7 +46,8 @@ import java.util.ArrayList;
 import static com.albertlardizabal.packoverflow.ui.PackingListFragment.currentPackingList;
 
 public class MainActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener, SavedListsFragment.OnPackingListSelectedListener {
+		implements NavigationView.OnNavigationItemSelectedListener,
+		SavedListsFragment.OnSavedListsFragmentListener, TemplateListsFragment.OnTemplateListsFragmentListener {
 
 	private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -102,28 +103,27 @@ public class MainActivity extends AppCompatActivity
 		configureFirebase();
 		configureNavigationDrawer();
 
-		stageData();
+		Boolean isFirstLoad = sharedPreferences.getBoolean(getString(R.string.preferences_is_first_load), true);
+		if (isFirstLoad) {
+			stageData();
+		}
 	}
 
 	private void stageData() {
 
-		Boolean isFirstLoad = sharedPreferences.getBoolean(getString(R.string.preferences_is_first_load), true);
-
-		if (isFirstLoad) {
-			ArrayList<PackingList> savedLists = Utils.stageData();
-			String userId = "demo";
-			if (firebaseAuth.getCurrentUser() != null) {
-				FirebaseUser user = firebaseAuth.getCurrentUser();
-				userId = user.getUid();
-			}
-			Log.d(LOG_TAG, "Stage Data");
-			for (PackingList list : savedLists) {
-				PackingListFragment.savedListsReference.child(userId).child(list.getTitle()).setValue(list);
-			}
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putBoolean(getString(R.string.preferences_is_first_load), false);
-			editor.commit();
+		ArrayList<PackingList> savedLists = Utils.stageData();
+		String userId = "demo";
+		if (firebaseAuth.getCurrentUser() != null) {
+			FirebaseUser user = firebaseAuth.getCurrentUser();
+			userId = user.getUid();
 		}
+		Log.d(LOG_TAG, "Stage Data");
+		for (PackingList list : savedLists) {
+			PackingListFragment.savedListsReference.child(userId).child(list.getTitle()).setValue(list);
+		}
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putBoolean(getString(R.string.preferences_is_first_load), false);
+		editor.commit();
 	}
 
 	private void configureFloatingActionButton() {
@@ -254,6 +254,7 @@ public class MainActivity extends AppCompatActivity
 	private void makeNewList() {
 		DialogFragment dialogFragment = new EditListDialogFragment();
 		dialogFragment.show(getSupportFragmentManager(), "newList");
+		navigateToFragment(SAVED_LISTS_FRAGMENT);
 	}
 
 	private void renameList() {
@@ -285,6 +286,13 @@ public class MainActivity extends AppCompatActivity
 				PackingList deleteList = lists.get(j);
 				if (deleteList.getIsChecked()) {
 					lists.remove(j);
+					String userId = "demo";
+					FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+					if (firebaseAuth.getCurrentUser() != null) {
+						FirebaseUser user = firebaseAuth.getCurrentUser();
+						userId = user.getUid();
+					}
+					PackingListFragment.savedListsReference.child(userId).child(deleteList.getTitle()).removeValue();
 				}
 			}
 			PackingListFragment.updateFirebase();
@@ -296,13 +304,16 @@ public class MainActivity extends AppCompatActivity
 		for (int i = 0; i < lists.size(); i++) {
 			PackingList list = lists.get(i);
 			if (list.getTitle().equals(currentPackingList.getTitle())) {
-				for (int j = list.getItems().size() - 1; j >= 0; j--) {
-					PackingListItem deleteItem = list.getItems().get(j);
-					if (deleteItem.getIsChecked()) {
-						list.getItems().remove(j);
-					}
+				lists.remove(i);
+
+				String userId = "demo";
+				FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+				if (firebaseAuth.getCurrentUser() != null) {
+					FirebaseUser user = firebaseAuth.getCurrentUser();
+					userId = user.getUid();
 				}
-				PackingListFragment.updateFirebase();
+				PackingListFragment.savedListsReference.child(userId).child(list.getTitle()).removeValue();
+				navigateToFragment(SAVED_LISTS_FRAGMENT);
 				return;
 			}
 		}
@@ -398,7 +409,7 @@ public class MainActivity extends AppCompatActivity
 		shareMenuItem.setVisible(false);
 	}
 
-	// OnPackingListSelected interface conformance
+	// OnSavedListsFragmentListener interface conformance
 	@Override
 	public void onPackingListSelected(PackingList packingList) {
 		for (PackingList list : PackingListFragment.packingLists) {
@@ -410,6 +421,19 @@ public class MainActivity extends AppCompatActivity
 		}
 		PackingListFragment.updateFirebase();
 		navigateToFragment(PACKING_LIST_FRAGMENT);
+	}
+
+	// OnTemplateListsFragmentListener interface conformance
+	@Override
+	public void onTemplateListSelected(PackingList packingList) {
+		String userId = "demo";
+		FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+		if (firebaseAuth.getCurrentUser() != null) {
+			FirebaseUser user = firebaseAuth.getCurrentUser();
+			userId = user.getUid();
+		}
+		PackingListFragment.savedListsReference.child(userId).child(packingList.getTitle()).setValue(packingList);
+		navigateToFragment(SAVED_LISTS_FRAGMENT);
 	}
 
 	// Auth
