@@ -34,6 +34,7 @@
 	<string name="dialog_list_title_hint">List Title</string>
 	<string name="dialog_ok">Ok</string>
 	<string name="dialog_cancel">Cancel</string>
+	<string name="dialog_invalid_characters">List names cannot contain \'.\', #, $, [, or ]</string>
 
 	<string name="share_list_title">Share list to</string>
 

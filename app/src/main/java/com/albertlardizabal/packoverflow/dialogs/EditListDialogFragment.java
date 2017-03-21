@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.albertlardizabal.packoverflow.R;
 import com.albertlardizabal.packoverflow.models.PackingList;
@@ -52,31 +53,38 @@ public class EditListDialogFragment extends DialogFragment {
 				.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
-						ArrayList<PackingList> lists = PackingListFragment.packingLists;
-						PackingList tempList = null;
-						if (list == null) {
-							PackingList newList = new PackingList();
-							if (title.getText().length() > 0) {
-								newList.setTitle(title.getText().toString());
-							}
-							for (PackingList aList : lists) {
-								aList.setActive(false);
-							}
-							newList.setActive(true);
-							lists.add(newList);
+
+						if (title.getText().toString().contains(".") || title.getText().toString().contains("#") || title.getText().toString().contains("$")
+								|| title.getText().toString().contains("[") || title.getText().toString().contains("]")) {
+							Toast.makeText(getContext(), getString(R.string.dialog_invalid_characters), Toast.LENGTH_LONG).show();
 						} else {
-							for (int i = 0; i < lists.size(); i++) {
-								tempList = lists.get(i);
-								if (tempList.getTitle().equals(list.getTitle())) {
-									tempList.setTitle(title.getText().toString());
-									break;
+
+							ArrayList<PackingList> lists = PackingListFragment.packingLists;
+							PackingList tempList = null;
+							if (list == null) {
+								PackingList newList = new PackingList();
+								if (title.getText().length() > 0) {
+									newList.setTitle(title.getText().toString());
+								}
+								for (PackingList aList : lists) {
+									aList.setActive(false);
+								}
+								newList.setActive(true);
+								lists.add(newList);
+							} else {
+								for (int i = 0; i < lists.size(); i++) {
+									tempList = lists.get(i);
+									if (tempList.getTitle().equals(list.getTitle())) {
+										tempList.setTitle(title.getText().toString());
+										break;
+									}
 								}
 							}
-						}
-						if (list != null) {
-							PackingListFragment.updateFirebaseWithList(list, tempList);
-						} else {
-							PackingListFragment.updateFirebase();
+							if (list != null) {
+								PackingListFragment.updateFirebaseWithList(list, tempList);
+							} else {
+								PackingListFragment.updateFirebase();
+							}
 						}
 					}
 				})

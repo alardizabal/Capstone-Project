@@ -274,8 +274,10 @@ public class MainActivity extends AppCompatActivity
 				if (list.getTitle().equals(currentPackingList.getTitle())) {
 					for (int j = list.getItems().size() - 1; j >= 0; j--) {
 						PackingListItem deleteItem = list.getItems().get(j);
-						if (deleteItem.getIsChecked()) {
-							list.getItems().remove(j);
+						if (deleteItem != null) {
+							if (deleteItem.getIsChecked()) {
+								list.getItems().remove(j);
+							}
 						}
 					}
 					PackingListFragment.updateFirebase();
@@ -285,15 +287,17 @@ public class MainActivity extends AppCompatActivity
 		} else if (CURRENT_FRAGMENT == SAVED_LISTS_FRAGMENT) {
 			for (int j = lists.size() - 1; j >= 0; j--) {
 				PackingList deleteList = lists.get(j);
-				if (deleteList.getIsChecked()) {
-					lists.remove(j);
-					String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
-					FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-					if (firebaseAuth.getCurrentUser() != null) {
-						FirebaseUser user = firebaseAuth.getCurrentUser();
-						userId = user.getUid();
+				if (deleteList != null) {
+					if (deleteList.getIsChecked()) {
+						lists.remove(j);
+						String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
+						FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+						if (firebaseAuth.getCurrentUser() != null) {
+							FirebaseUser user = firebaseAuth.getCurrentUser();
+							userId = user.getUid();
+						}
+						PackingListFragment.savedListsReference.child(userId).child(deleteList.getTitle()).removeValue();
 					}
-					PackingListFragment.savedListsReference.child(userId).child(deleteList.getTitle()).removeValue();
 				}
 			}
 			PackingListFragment.updateFirebase();
@@ -304,18 +308,20 @@ public class MainActivity extends AppCompatActivity
 		ArrayList<PackingList> lists = PackingListFragment.packingLists;
 		for (int i = 0; i < lists.size(); i++) {
 			PackingList list = lists.get(i);
-			if (list.getTitle().equals(currentPackingList.getTitle())) {
-				lists.remove(i);
+			if (list != null) {
+				if (list.getTitle().equals(currentPackingList.getTitle())) {
+					lists.remove(i);
 
-				String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
-				FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-				if (firebaseAuth.getCurrentUser() != null) {
-					FirebaseUser user = firebaseAuth.getCurrentUser();
-					userId = user.getUid();
+					String userId = MyApplication.getContext().getString(R.string.firebase_demo_user);
+					FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+					if (firebaseAuth.getCurrentUser() != null) {
+						FirebaseUser user = firebaseAuth.getCurrentUser();
+						userId = user.getUid();
+					}
+					PackingListFragment.savedListsReference.child(userId).child(list.getTitle()).removeValue();
+					navigateToFragment(SAVED_LISTS_FRAGMENT);
+					return;
 				}
-				PackingListFragment.savedListsReference.child(userId).child(list.getTitle()).removeValue();
-				navigateToFragment(SAVED_LISTS_FRAGMENT);
-				return;
 			}
 		}
 	}
@@ -482,6 +488,8 @@ public class MainActivity extends AppCompatActivity
 					public void onComplete(@NonNull Task<Void> task) {
 						// user is now signed out
 						configureNavigationHeaderView();
+						stageData();
+						PackingListFragment.updateFirebase();
 						progress.dismiss();
 					}
 				});

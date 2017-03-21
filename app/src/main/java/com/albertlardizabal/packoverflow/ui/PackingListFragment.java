@@ -84,7 +84,9 @@ public class PackingListFragment extends Fragment {
 			userId = user.getUid();
 		}
 		for (PackingList list : packingLists) {
-			savedListsReference.child(userId).child(list.getTitle()).setValue(list);
+			if (list != null) {
+				savedListsReference.child(userId).child(list.getTitle()).setValue(list);
+			}
 		}
 	}
 
@@ -95,8 +97,12 @@ public class PackingListFragment extends Fragment {
 			FirebaseUser user = firebaseAuth.getCurrentUser();
 			userId = user.getUid();
 		}
-		savedListsReference.child(userId).child(oldList.getTitle()).removeValue();
-		savedListsReference.child(userId).child(newList.getTitle()).setValue(newList);
+		if (oldList != null) {
+			savedListsReference.child(userId).child(oldList.getTitle()).removeValue();
+		}
+		if (newList != null) {
+			savedListsReference.child(userId).child(newList.getTitle()).setValue(newList);
+		}
 	}
 
 	@Override
@@ -151,6 +157,9 @@ public class PackingListFragment extends Fragment {
 					MainActivity.toolbar.setTitle(currentPackingList.getTitle());
 				}
 				adapter.notifyDataSetChanged();
+				if (SavedListsFragment.adapter != null) {
+					SavedListsFragment.adapter.notifyDataSetChanged();
+				}
 
 				Log.d(LOG_TAG, "onChildAdded");
 			}
@@ -167,6 +176,9 @@ public class PackingListFragment extends Fragment {
 					}
 				}
 				adapter.notifyDataSetChanged();
+				if (SavedListsFragment.adapter != null) {
+					SavedListsFragment.adapter.notifyDataSetChanged();
+				}
 				Log.d(LOG_TAG, "onChildChanged");
 			}
 
@@ -232,42 +244,44 @@ public class PackingListFragment extends Fragment {
 
 			final PackingListItem listItem = PackingListFragment.currentListItems.get(position);
 
-			holder.title.setText(listItem.getTitle());
-			holder.subtitle.setText(listItem.getSubtitle());
-			holder.quantity.setText("x" + listItem.getQuantity());
-			System.out.println("Checked " + position + " " + listItem.getIsChecked());
-			holder.checkBox.setChecked(listItem.getIsChecked());
+			if (listItem != null) {
+				holder.title.setText(listItem.getTitle());
+				holder.subtitle.setText(listItem.getSubtitle());
+				holder.quantity.setText("x" + listItem.getQuantity());
+				System.out.println("Checked " + position + " " + listItem.getIsChecked());
+				holder.checkBox.setChecked(listItem.getIsChecked());
 
-			if (!holder.checkBox.hasOnClickListeners()) {
-				holder.checkBox.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						for (int i = 0; i < packingLists.size(); i++) {
-							if (packingLists.get(i).getTitle().equals(currentPackingList.getTitle())) {
-								PackingList list = packingLists.get(i);
-								PackingListItem item = list.getItems().get(position);
-								item.setIsChecked(!item.getIsChecked());
-								currentListItems = list.getItems();
-								updateFirebase();
-								break;
+				if (!holder.checkBox.hasOnClickListeners()) {
+					holder.checkBox.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							for (int i = 0; i < packingLists.size(); i++) {
+								if (packingLists.get(i).getTitle().equals(currentPackingList.getTitle())) {
+									PackingList list = packingLists.get(i);
+									PackingListItem item = list.getItems().get(position);
+									item.setIsChecked(!item.getIsChecked());
+									currentListItems = list.getItems();
+									updateFirebase();
+									break;
+								}
 							}
 						}
-					}
-				});
-			}
+					});
+				}
 
-			if (!holder.itemView.hasOnClickListeners()) {
-				holder.itemView.setOnClickListener(new View.OnClickListener() {
+				if (!holder.itemView.hasOnClickListeners()) {
+					holder.itemView.setOnClickListener(new View.OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-						Bundle itemBundle = new Bundle();
-						itemBundle.putParcelable("listItem", listItem);
-						DialogFragment dialogFragment = new EditItemDialogFragment();
-						dialogFragment.setArguments(itemBundle);
-						dialogFragment.show(getFragmentManager(), "editListItem");
-					}
-				});
+						@Override
+						public void onClick(View v) {
+							Bundle itemBundle = new Bundle();
+							itemBundle.putParcelable("listItem", listItem);
+							DialogFragment dialogFragment = new EditItemDialogFragment();
+							dialogFragment.setArguments(itemBundle);
+							dialogFragment.show(getFragmentManager(), "editListItem");
+						}
+					});
+				}
 			}
 		}
 
